@@ -1,0 +1,94 @@
+{
+  "format": 1,
+  "assets": [
+    {
+      "path": "sounds/ui_click.ogg",
+      "title": "UI click",
+      "author": "Wanderer dice farkle game project",
+      "source": "Procedural synthesis: tools/generate_sfx.sh",
+      "license": "CC0-1.0",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    {
+      "path": "sounds/ui_hover.ogg",
+      "title": "UI hover",
+      "author": "Wanderer dice farkle game project",
+      "source": "Procedural synthesis: tools/generate_sfx.sh",
+      "license": "CC0-1.0",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    {
+      "path": "sounds/die_select.ogg",
+      "title": "Die select",
+      "author": "Wanderer dice farkle game project",
+      "source": "Procedural synthesis: tools/generate_sfx.sh",
+      "license": "CC0-1.0",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    {
+      "path": "sounds/coin_bank.ogg",
+      "title": "Coin bank",
+      "author": "Wanderer dice farkle game project",
+      "source": "Procedural synthesis: tools/generate_sfx.sh",
+      "license": "CC0-1.0",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    {
+      "path": "sounds/farkle.ogg",
+      "title": "Farkle",
+      "author": "Wanderer dice farkle game project",
+      "source": "Procedural synthesis: tools/generate_sfx.sh",
+      "license": "CC0-1.0",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    {
+      "path": "sounds/win_fanfare.ogg",
+      "title": "Win fanfare",
+      "author": "Wanderer dice farkle game project",
+      "source": "Procedural synthesis: tools/generate_sfx.sh",
+      "license": "CC0-1.0",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    {
+      "path": "sounds/dice_roll.ogg",
+      "title": "Dice roll",
+      "author": "Wanderer dice farkle game project",
+      "source": "Procedural synthesis: tools/generate_sfx.sh (filtered noise, no samples)",
+      "license": "CC0-1.0",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    {
+      "path": "../sounds/music/Medival Theme/ebunny-medieval-dance-357912.mp3",
+      "title": "Medieval Dance",
+      "author": "Ebunny",
+      "source": "https://pixabay.com/music/folk-medieval-dance-357912/",
+      "license": "Pixabay Content License",
+      "license_url": "https://pixabay.com/service/license-summary/"
+    },
+    {
+      "path": "../sounds/music/Medival Theme/kiravale-medieval-music-593694.mp3",
+      "title": "Medieval Music",
+      "author": "kiravale",
+      "source": "https://pixabay.com/music/celtic-medieval-music-593694/",
+      "license": "Pixabay Content License",
+      "license_url": "https://pixabay.com/service/license-summary/"
+    },
+    {
+      "path": "../sounds/music/Medival Theme/tunetank-medieval-happy-music-412790.mp3",
+      "title": "Medieval Happy Music",
+      "author": "Tunetank",
+      "source": "https://pixabay.com/music/adventure-medieval-happy-music-412790/",
+      "license": "Pixabay Content License",
+      "license_url": "https://pixabay.com/service/license-summary/"
+    },
+    {
+      "path": "../sounds/music/Medival Theme/vifotofreesounds-playful-medieval-war-486717.mp3",
+      "title": "Playful Medieval War",
+      "author": "VifotoFreeSounds",
+      "source": "https://pixabay.com/music/folk-playful-medieval-war-486717/",
+      "license": "Pixabay Content License",
+      "license_url": "https://pixabay.com/service/license-summary/"
+    }
+  ],
+  "instructions": "For every publicly distributed file provide path, title, author, source, license and license_url. Keep required license texts in assets/licenses/."
+}

@@ -1,0 +1,8 @@
+{
+  "name": "Nazwa moda",
+  "version": "1.0",
+  "author": "Autor",
+  "license": "CC0-1.0",
+  "source_url": "https://example.com",
+  "enabled": true
+}

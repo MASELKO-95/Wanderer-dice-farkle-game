@@ -1,0 +1,50 @@
+[gd_resource type="Resource" script_class="DialogueSequence" load_steps=10 format=3]
+[ext_resource type="Script" path="res://scripts/dialogue_sequence.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/dialogue_line.gd" id="2"]
+[ext_resource type="Script" path="res://scripts/dialogue_choice.gd" id="3"]
+[sub_resource type="Resource" id="IntroNarrator"]
+script = ExtResource("2")
+speaker_key = "dialogue_narrator"
+text_key = "campaign_story_12"
+portrait_side = "narrator"
+backdrop = "royal"
+[sub_resource type="Resource" id="IntroOpponent"]
+script = ExtResource("2")
+speaker_key = "campaign_opponent_12"
+text_key = "dialogue_challenge"
+portrait_id = "builtin:monk"
+backdrop = "royal"
+[sub_resource type="Resource" id="EndingPrincess"]
+script = ExtResource("3")
+id = "princess"
+text_key = "dialogue_choice_princess"
+ending_id = "princess"
+[sub_resource type="Resource" id="EndingEmperor"]
+script = ExtResource("3")
+id = "emperor"
+text_key = "dialogue_choice_emperor"
+ending_id = "emperor"
+[sub_resource type="Resource" id="EndingChampion"]
+script = ExtResource("3")
+id = "world_champion"
+text_key = "dialogue_choice_champion"
+ending_id = "world_champion"
+[sub_resource type="Resource" id="Victory"]
+script = ExtResource("2")
+speaker_key = "dialogue_narrator"
+text_key = "dialogue_final_choice_prompt"
+portrait_side = "narrator"
+backdrop = "royal"
+choices = Array[Resource]([SubResource("EndingPrincess"), SubResource("EndingEmperor"), SubResource("EndingChampion")])
+[sub_resource type="Resource" id="Defeat"]
+script = ExtResource("2")
+speaker_key = "campaign_opponent_12"
+text_key = "dialogue_opponent_wins"
+portrait_id = "builtin:monk"
+backdrop = "royal"
+[resource]
+script = ExtResource("1")
+title_key = "campaign_title"
+intro_lines = Array[Resource]([SubResource("IntroNarrator"), SubResource("IntroOpponent")])
+victory_lines = Array[Resource]([SubResource("Victory")])
+defeat_lines = Array[Resource]([SubResource("Defeat")])

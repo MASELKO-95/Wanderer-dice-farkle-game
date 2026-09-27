@@ -1,0 +1,25 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/tavern_world.gd" id="1_world"]
+
+[node name="TavernWorld" type="Node3D"]
+script = ExtResource("1_world")
+
+[node name="EditorAnchors" type="Node3D" parent="."]
+
+[node name="DiceCenter" type="Marker3D" parent="EditorAnchors"]
+position = Vector3(0, 1.09, 0)
+
+[node name="PlayerSeat" type="Marker3D" parent="EditorAnchors"]
+position = Vector3(0, 0, 3.4)
+
+[node name="FarSeat" type="Marker3D" parent="EditorAnchors"]
+position = Vector3(0, 0, -2.62)
+
+[node name="LeftSeat" type="Marker3D" parent="EditorAnchors"]
+position = Vector3(-3.25, 0, 0.1)
+rotation = Vector3(0, -1.5708, 0)
+
+[node name="RightSeat" type="Marker3D" parent="EditorAnchors"]
+position = Vector3(3.25, 0, 0.1)
+rotation = Vector3(0, 1.5708, 0)

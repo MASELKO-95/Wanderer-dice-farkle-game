@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://dhiss4c0edqli"
+path="res://.godot/imported/tunetank-medieval-happy-music-412790.mp3-b158c88345aef01bca5da2aad00e5a1a.mp3str"
+
+[deps]
+
+source_file="res://sounds/music/Medival Theme/tunetank-medieval-happy-music-412790.mp3"
+dest_files=["res://.godot/imported/tunetank-medieval-happy-music-412790.mp3-b158c88345aef01bca5da2aad00e5a1a.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

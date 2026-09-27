@@ -1,0 +1,6 @@
+The procedurally synthesized sound effects listed in asset_manifest.json are
+made available under CC0 1.0 Universal.
+
+License summary and legal code:
+https://creativecommons.org/publicdomain/zero/1.0/
+https://creativecommons.org/publicdomain/zero/1.0/legalcode

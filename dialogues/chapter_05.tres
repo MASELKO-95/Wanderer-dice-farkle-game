@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="DialogueSequence" load_steps=6 format=3]
+[ext_resource type="Script" path="res://scripts/dialogue_sequence.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/dialogue_line.gd" id="2"]
+[sub_resource type="Resource" id="IntroNarrator"]
+script = ExtResource("2")
+speaker_key = "dialogue_narrator"
+text_key = "campaign_story_5"
+portrait_side = "narrator"
+[sub_resource type="Resource" id="IntroOpponent"]
+script = ExtResource("2")
+speaker_key = "campaign_opponent_5"
+text_key = "dialogue_challenge"
+portrait_id = "builtin:madman"
+[sub_resource type="Resource" id="Victory"]
+script = ExtResource("2")
+speaker_key = "campaign_opponent_5"
+text_key = "dialogue_opponent_defeated"
+portrait_id = "builtin:madman"
+[sub_resource type="Resource" id="Defeat"]
+script = ExtResource("2")
+speaker_key = "campaign_opponent_5"
+text_key = "dialogue_opponent_wins"
+portrait_id = "builtin:madman"
+[resource]
+script = ExtResource("1")
+title_key = "campaign_title"
+intro_lines = Array[Resource]([SubResource("IntroNarrator"), SubResource("IntroOpponent")])
+victory_lines = Array[Resource]([SubResource("Victory")])
+defeat_lines = Array[Resource]([SubResource("Defeat")])
+

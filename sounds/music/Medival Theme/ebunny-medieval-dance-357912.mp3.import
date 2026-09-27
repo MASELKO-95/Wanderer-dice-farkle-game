@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://3fmpybclykfy"
+path="res://.godot/imported/ebunny-medieval-dance-357912.mp3-8901e55877a529570caad90d39ffed19.mp3str"
+
+[deps]
+
+source_file="res://sounds/music/Medival Theme/ebunny-medieval-dance-357912.mp3"
+dest_files=["res://.godot/imported/ebunny-medieval-dance-357912.mp3-8901e55877a529570caad90d39ffed19.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

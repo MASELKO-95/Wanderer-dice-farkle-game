@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://crc3gf0tx4j1x"
+path="res://.godot/imported/vifotofreesounds-playful-medieval-war-486717.mp3-769e132d2b121589777c7dcc1443cb6e.mp3str"
+
+[deps]
+
+source_file="res://sounds/music/Medival Theme/vifotofreesounds-playful-medieval-war-486717.mp3"
+dest_files=["res://.godot/imported/vifotofreesounds-playful-medieval-war-486717.mp3-769e132d2b121589777c7dcc1443cb6e.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

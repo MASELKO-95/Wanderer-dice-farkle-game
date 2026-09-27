@@ -1,17 +1,57 @@
-# Godot 4+ specific ignores
+# Godot cache, generated exports and credentials
 .godot/
-.nomedia
-
-# Godot-specific ignores
 .import/
-export.cfg
+/android/
+/build/
+/dist/
+/exports/
 export_credentials.cfg
-*.tmp
-
-# Imported translations (automatically generated from CSV files)
-*.translation
-
-# Mono-specific ignores
+.nomedia
 .mono/
 data_*/
 mono_crash.*.json
+*.translation
+
+# Local environment, editor and agent settings
+.env
+.env.*
+!.env.example
+.agents/
+.codex/
+.idea/
+.vscode/
+*.pem
+*.key
+*.p12
+*.pfx
+*.keystore
+*.jks
+
+# Logs, backups, saves and temporary files
+*.log
+*.tmp
+*.bak
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+farkle_progress.cfg
+campaign_slot_*.cfg*
+
+# Local writing and publication drafts
+/GITHUB_RELEASE.md
+/GAMEJOLT_RELEASE.md
+/dialogues/scenario
+/dialogues/KAMPANIA_DIAGRAM.txt
+/dialogues/OPENING_NOTES.md
+/CC
+
+# Local model diagnostics
+/tools/avatar_preview.gd*
+/tools/inspect_avatar.gd*
+
+# Unused legacy audio and duplicate download
+/sounds/*.ogg
+/sounds/*.ogg.import
+/sounds/music/Medival Theme/* (1).mp3*
