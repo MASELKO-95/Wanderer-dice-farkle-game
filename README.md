@@ -1,229 +1,234 @@
 # Wanderer dice farkle game
 
-> **Wersja 0.8 Alpha — pre-release (`0.8.0-alpha`).** Kampania i modele postaci są obecnie
-> przebudowywane. Dostępna wersja jest grywalna, ale zawartość, oprawa i zapis
-> postępu mogą jeszcze ulec zmianie.
+> **Version 0.8 Alpha — pre-release (`0.8.0-alpha`).** The campaign and
+> character models are being reworked. This version is playable, but its
+> content, visuals and save format may still change.
 
-Zaczynasz jako ubogi chłop wyrzucony z domu. Nie masz pieniędzy, wpływów ani
-miejsca, do którego możesz wrócić. Masz tylko sześć zwykłych kości i szansę,
-żeby odmienić swój los. W tym świecie problemy, spory i wielkie ambicje
-rozstrzyga się przy stole do gry. Dokąd zaprowadzi cię ta droga? To już twoja sprawa.
+You begin as a poor peasant thrown out of your home. You have no money,
+influence or place to return to — just six ordinary dice and a chance to
+change your fate. In this world, disputes and grand ambitions are settled
+at the gaming table. Where that road takes you is up to you.
 
-**Wanderer dice farkle game** to gra w kości inspirowana systemem Farkle z
-*Kingdom Come: Deliverance*. Odkładaj punktujące kości, dobieraj swój zestaw i
-zdecyduj, czy zachować zdobyte punkty, czy postawić wszystko na kolejny rzut.
-Obecna wersja zawiera zalążek kampanii, szybkie pojedynki z botami oraz
-multiplayer ENet dla 2–4 graczy. Wolne miejsca host może wypełnić botami.
+**Wanderer dice farkle game** is a dice game inspired by the Farkle system in
+*Kingdom Come: Deliverance*. Set aside scoring dice, build your loadout, and
+decide whether to bank your points or risk another roll. The current version
+includes an early campaign, quick matches against bots, and ENet multiplayer
+for 2–4 players. The host can fill empty seats with bots.
 
-Planujemy rozbudowaną kampanię fabularną z różnymi zakończeniami i decyzjami,
-które nadadzą kierunek historii bohatera. Średniowiecze to początek: w planach
-są również inne motywy i realia, w tym współczesne. Pełna kampania oraz nowe
-realia są kierunkiem rozwoju projektu.
+A larger story campaign with multiple endings and meaningful choices is
+planned. The medieval setting is only the beginning: other themes and
+settings, including modern ones, are also planned. The full campaign and
+additional settings are development goals.
 
-**Autor na GitHubie:** [MASELKO-95](https://github.com/MASELKO-95)
+**Creator:** [MASELKO-95](https://github.com/MASELKO-95)
 
-## Najważniejsze funkcje
+## Features
 
-- kampania z dialogami, wyborami, srebrem, zakładami i sklepem z kośćmi;
-- szybkie pojedynki z botami o kilku poziomach trudności;
-- multiplayer ENet dla 2–4 graczy, z botami przejmującymi wolne miejsca;
-- specjalne ważone kości i własne zestawy;
-- wersje językowe, personalizacja postaci oraz obsługa modów;
-- wydania desktopowe dla Windows i Linux.
+- A campaign with dialogue, choices, silver, wagers and a dice shop.
+- Quick matches against bots with several difficulty levels.
+- ENet multiplayer for 2–4 players, with bots filling vacant seats.
+- Special weighted dice and custom loadouts.
+- Multiple languages, character customization and mod support.
+- Desktop export support for Windows and Linux.
 
-## Licencja
+## License
 
-Oryginalne elementy projektu są udostępniane przez MASELKO-95 na licencji
-**Creative Commons Attribution-NonCommercial 4.0 International
-(CC BY-NC 4.0)**. Możesz je kopiować i modyfikować do celów niekomercyjnych,
-pod warunkiem podania autora i źródła, dołączenia linku do licencji oraz
-zaznaczenia wprowadzonych zmian.
+Original project material is released by MASELKO-95 under **Creative Commons
+Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)**. You may copy and
+modify it for noncommercial purposes with attribution, a source reference,
+a link to the license, and an indication of your changes.
 
-Materiały osób trzecich nie przechodzą na CC BY-NC: zachowują własne licencje.
-Dotyczy to między innymi muzyki z Pixabay, komponentów silnika Godot i
-zewnętrznych modów. Szczegóły i gotowy wzór atrybucji znajdują się w
-[`LICENSE.md`](LICENSE.md), a wykaz materiałów zewnętrznych w
-[`THIRD_PARTY_ASSETS.md`](THIRD_PARTY_ASSETS.md) i
-[`assets/asset_manifest.json`](assets/asset_manifest.json).
+Third-party material retains its own licenses. This includes Pixabay music,
+Godot Engine components and external mods. See [`LICENSE.md`](LICENSE.md)
+for the scope and an attribution example, and
+[`THIRD_PARTY_ASSETS.md`](THIRD_PARTY_ASSETS.md) and
+[`assets/asset_manifest.json`](assets/asset_manifest.json) for asset notices.
 
-Użycie komercyjne wymaga osobnej zgody autora.
+Commercial use of material covered by CC BY-NC requires separate permission
+from the creator.
 
-## Uruchomienie
+## Running the project
 
-1. Otwórz `project.godot` w Godot 4.7.2 lub nowszym.
-2. Uruchom projekt klawiszem **F6/F5**.
+1. Open `project.godot` in Godot 4.7.2 or later.
+2. Press **F5** to run the project, or **F6** to run the current scene.
 
-Scenę karczmy można otworzyć i oglądać bez uruchamiania gry:
-`scenes/tavern_world.tscn`. Ma znaczniki czterech miejsc, środka kości i
-podgląd proceduralnej geometrii dzięki skryptowi `@tool`.
+You can preview the tavern without running the game by opening
+`scenes/tavern_world.tscn`. Its `@tool` script previews procedural geometry,
+with markers for four seats and the center of the dice area.
 
-## Srebro i sklep w kampanii
+## Campaign silver and the dice shop
 
-Menu główne ma pionową listę przycisków. Ustawienia postaci, języka, kości i
-przeciwnika szybkiej gry są pod **Postać i ustawienia**.
-**Szybki pojedynek** i **Multiplayer** otwierają najpierw przygotowanie gry:
-ustawiasz cel punktowy, postać i zestaw kości, a w pojedynku także bota oraz
-trudność. Przycisk startu pozostaje pod przewijaną listą ustawień. Multiplayer
-prowadzi następnie do lobby; cel punktowy wspólnego meczu ustala host.
-Wybór języka jest też stale dostępny w lewym dolnym rogu. Podczas dialogu
-zmiana języka zachowuje bieżącą kwestię i decyzje.
+The main menu uses a vertical button list. Character, language, dice and
+quick-match opponent settings are under **Character & settings**.
+**Quick match** and **Multiplayer** first open match setup, where you choose
+the target score, character and dice loadout; quick matches also let you
+select a bot and difficulty. The start button sits below the scrollable
+settings. Multiplayer then opens the lobby, where the host sets the shared
+target score.
 
-Przycisk **Kampania** otwiera sześć miejsc zapisu. Każde ma niezależny postęp,
-srebro, kolekcję, wybory i zakończenie. **Zapisz osobną ścieżkę** w rozmowie
-zapisuje kopię przed decyzją w pustym miejscu; wczytaj ją, by sprawdzić inną drogę.
-Starszy pojedynczy zapis kampanii jest przenoszony do pierwszego miejsca.
-Zapisy wznawiają dialogi, ale nie niedokończone partie kości.
-Przycisk **Usuń** przy zapisie wymaga potwierdzenia jego numeru. Usunięty zapis
-znika z listy, a jego plik trafia do archiwum `campaign_slot_N.cfg.deleted-*`
-w katalogu danych gry, skąd można go ręcznie odzyskać.
+The language selector is also available in the bottom-left corner. Changing
+language during dialogue preserves the current line and choices.
 
-Zaczynasz jako prosty, ubogi chłop: bez tytułu, z 0 srebra i sześcioma zwykłymi
-kośćmi. Pierwsze pieniądze musisz wygrać. Na ekranie kampanii otwórz **Sklep z kośćmi**.
-Wybierz jedno z sześciu miejsc, a następnie kup kość albo załóż
-posiadany egzemplarz. Zakup dotyczy jednej kości i od razu wyposaża wybrane miejsce;
-możesz posiadać maksymalnie sześć egzemplarzy każdego rodzaju.
+**Campaign** opens six save slots, each with independent progress, silver,
+collection, choices and ending. **Save a separate path** copies your progress
+before a choice into an empty slot, so you can load it to explore another
+route. Legacy single-slot saves migrate to the first slot. Saves resume
+dialogue, but not unfinished dice matches.
 
-Pierwsze zwycięstwo w rozdziale daje 150 srebra + 25 za każdy kolejny rozdział
-(150 w pierwszym, 175 w drugim itd.). Powtórna wygrana daje odpowiednio 50 + 10.
-Porażka nie zabiera srebra. Ceny specjalnych kości wynoszą od 40 do 480 srebra.
-Po porażce możesz otworzyć sklep przed ponowną próbą.
+Deleting a save requires confirmation of its slot number. Its file is
+archived as `campaign_slot_N.cfg.deleted-*` in the game data directory and
+can be recovered manually.
 
-Sakiewka, kolekcja i zestaw kampanii zapisują się automatycznie. Starsze zapisy
-otrzymują srebro za już ukończone rozdziały. Kampania ma osobny zestaw kości;
-szybkie pojedynki i multiplayer zachowują odblokowywanie przez liczbę meczów.
+You start without a title, with 0 silver and six ordinary dice. Earn your
+first coins at the table, then open the **Dice shop** from the campaign
+screen. Select one of six loadout slots to buy or equip a die. Each purchase
+buys one die and equips it immediately; you can own up to six of each type.
 
-Wybrani przeciwnicy przyjmują opcjonalne zakłady przed meczem: karczmarka do 50,
-złodziej do 100, błazen do 200, kupiec do 500 srebra. Zakład ustalasz w rozmowie:
-proponujesz stawkę, przeciwnik potwierdza warunki, a ty zgadzasz się lub negocjujesz
-ponownie. Możesz wybrać grę bez zakładu. Stawka jest pobierana przy rozpoczęciu pojedynku. Wygrana wypłaca 2× stawkę
-łącznie z jej zwrotem (stawiasz 25, otrzymujesz 50, zarabiasz 25), niezależnie od
-zwykłej nagrody za zwycięstwo. Porażka lub opuszczenie rozpoczętego meczu oznacza
-utratę stawki. Limity ustawia się osobno w `CampaignCatalog.WAGER_LIMITS`; brak
-przeciwnika w tej tabeli wyłącza zakłady z nim.
+The standard first-win reward is 150 silver plus 25 for each subsequent
+chapter (150 in the first, 175 in the second, and so on). Repeat wins award
+50 plus 10 per subsequent chapter. Losing does not deduct silver except for
+an agreed wager. Special dice cost 40–480 silver. You can visit the shop
+after losing and before retrying. The opening tutorial and story rewards
+are handled separately.
 
-## Sterowanie
+Your purse, collection and campaign loadout save automatically. Legacy saves
+receive silver for previously completed chapters. The campaign has its own
+loadout; quick matches and multiplayer retain unlocks based on match count.
 
-- **Spacja** — rzut;
-- **E** — odłóż/cofnij kość wskazaną kursorem (jak „Hold die”);
-- **F** — zatwierdź wybrane kości i rzuć pozostałymi;
-- **Q** — zapisz punkty i zakończ turę;
-- **Enter** — alternatywny zapis punktów;
-- **PPM + ruch myszy** — lekkie rozglądanie.
+Selected opponents accept optional wagers: the thief up to 100, the jester
+up to 200, and the merchant up to 500 silver. Negotiate the stake in dialogue,
+confirm the terms, or choose to play without a wager. The stake is deducted
+when the match begins. A win pays twice the stake including its return
+(stake 25, receive 50, profit 25), in addition to the regular victory reward.
+Losing or leaving a started match forfeits the stake. Limits are configured
+in `CampaignCatalog.WAGER_LIMITS`; opponents absent from that table do not
+accept wagers.
 
-## Multiplayer LAN i playit.gg
+## Controls
 
-Host wybiera **Multiplayer**, ustawia port UDP (domyślnie 7777), klika
-**Utwórz stół**, dodaje boty i rozpoczyna mecz. Klienci w tej samej sieci LAN
-wpisują pokazany lokalny adres hosta i ten sam port.
+- **Space** — roll.
+- **E** — hold or release the die under the cursor.
+- **F** — confirm selected dice and roll the remaining dice.
+- **Q** — bank points and end your turn.
+- **Enter** — alternative key for banking points.
+- **Right mouse button + mouse movement** — look around slightly.
 
-Połączenie internetowe korzysta z zewnętrznego agenta playit.gg:
+## LAN multiplayer and playit.gg
 
-1. Host uruchamia grę i tworzy stół na lokalnym porcie UDP 7777.
-2. W panelu playit.gg tworzy tunel typu **UDP**, z jednym portem, kierowany na
-   `127.0.0.1:7777` (Proxy Protocol powinien pozostać wyłączony).
-3. Agent playit.gg musi działać przez cały mecz.
-4. Znajomi wpisują w grze publiczną nazwę/IP i **publiczny port** pokazane przez
-   playit.gg, np. `nazwa.gl.at.ply.gg:30123`. Publiczny port nie musi być 7777.
+The host selects **Multiplayer**, sets a UDP port (7777 by default), creates
+a table, adds any bots and starts the match. Players on the same LAN enter
+the host's displayed local address and the same port.
 
-Godot ENet używa UDP. Zapora systemowa musi pozwalać grze hosta nasłuchiwać na
-wybranym porcie. Host jest autorytatywny: tylko on losuje wyniki, sprawdza ruchy
-i prowadzi boty. Po rozłączeniu gracza podczas meczu jego miejsce przejmuje bot.
+For Internet play using the external playit.gg agent:
 
-## Wymienne dźwięki i modele
+1. Start the game and host a table on local UDP port 7777.
+2. Create a single-port **UDP** tunnel in playit.gg pointing to
+   `127.0.0.1:7777`, with Proxy Protocol disabled.
+3. Keep the playit.gg agent running throughout the match.
+4. Other players enter the public hostname/IP and **public port** shown by
+   playit.gg, such as `example.gl.at.ply.gg:30123`. The public port may differ
+   from 7777.
 
-Przed eksportem własne pliki umieszcza się w `assets/sounds/` (OGG Vorbis) i
-`assets/models/` (GLB/GLTF/FBX). Po eksporcie można umieścić ten sam katalog
-`assets/` obok pliku wykonywalnego; pliki zewnętrzne mają pierwszeństwo przed
-zasobami w PCK. Proceduralne modele są bezpiecznym fallbackiem.
+Godot ENet uses UDP. The host's firewall must allow the game to listen on
+the selected port. The host generates rolls, validates moves and runs bots.
+A bot takes over if a player disconnects during a match.
 
-Efekty w `assets/sounds/` są syntetyzowane bez zewnętrznych sampli przez
-`tools/generate_sfx.sh` i opisane jako CC0-1.0. Starszy katalog `sounds/`
-pozostaje tylko roboczym archiwum i jest wykluczony z eksportu.
+## Custom sounds and models
 
-### Mody bez przebudowy gry
+Before exporting, place sounds in `assets/sounds/` (Ogg Vorbis) and models
+in `assets/models/` (GLB/GLTF/FBX). After exporting, you can place the same
+`assets/` directory beside the executable. External files take priority over
+resources inside the PCK. Procedural models provide a fallback.
 
-Każda paczka może być osobnym folderem:
+The effects in `assets/sounds/` are synthesized without external samples by
+`tools/generate_sfx.sh` and are marked CC0-1.0. Legacy effects directly under
+`sounds/` are excluded from version control and exports; the music under
+`sounds/music/` is used by the game.
+
+### Mods without rebuilding
+
+Each mod can use its own directory:
 
 ```text
-mods/nazwa_moda/
+mods/my_mod/
 ├── mod.json
-├── sounds/*.ogg lub *.mp3
-└── models/**/*.glb, *.gltf lub *.fbx
+├── sounds/*.ogg or *.mp3
+└── models/**/*.glb, *.gltf or *.fbx
 ```
 
-Gra wykrywa katalogi automatycznie. Model wybiera się z listy **Model gracza**
-w menu, a model przeciwnika solo z listy **Model bota**. W lobby host wybiera
-**Model dodawanego bota** przed każdym kliknięciem `+ BOT`, więc trzy boty mogą
-mieć różne postacie. Paczkę efektów wybiera się w **Ustawieniach dźwięku**. Przycisk **Odśwież mody**
-pozwala zobaczyć pliki dodane już po uruchomieniu gry. Brakujący efekt z
-niepełnego moda zostanie zastąpiony domyślnym dźwiękiem.
+The game detects mod folders automatically. Choose your character under
+**Player model**, and your solo opponent under **Bot model**. In the lobby,
+the host chooses the model before each `+ BOT` click, allowing different
+characters for all three bots. Select sound packs in **Sound settings**.
+**Refresh mods** detects files added while the game is running. Missing
+effects fall back to the default sound pack.
 
-ZIP jest tylko paczką transportową i trzeba go najpierw rozpakować do katalogu
-`mods`. Sama zmiana rozszerzenia pliku MP3 na `.ogg` nie konwertuje dźwięku;
-gra rozpozna taki przypadek, odtworzy MP3 i pokaże ostrzeżenie o złej nazwie.
+Extract ZIP archives into `mods/` before use. Renaming an MP3 file to
+`.ogg` does not convert it; the game detects this, plays the MP3 and warns
+about the incorrect extension.
 
-W multiplayerze identyfikatory modeli graczy i botów są synchronizowane. Każdy
-komputer powinien mieć tę samą paczkę; jeśli jej nie ma, zobaczy bezpieczny
-model domyślny. Dokładna struktura i szablon manifestu są w
-`mods/README.md` oraz `mods/mod.json.example`.
+Multiplayer synchronizes player and bot model IDs. Each computer should
+have the same mod pack; otherwise, it displays a default model. See
+[`mods/README.md`](mods/README.md) and `mods/mod.json.example` for the
+directory structure and manifest format.
 
-Modele są automatycznie skalowane do wymiarów karczmy. Dla modeli ze zgodnie
-nazwanymi kośćmi ramion gra pokazuje również własne ciało i ręce z pierwszej
-osoby, ukrywając przed lokalną kamerą elementy głowy.
+Models scale automatically to fit the tavern. With supported arm-bone names,
+the game also displays your body and arms in first person while hiding the
+head from the local camera.
 
-Struktura paczek i manifestów jest opisana w [`mods/README.md`](mods/README.md). Skrypt
-`tools/package_release.sh KATALOG_EKSPORTU` kopiuje folder assetów wraz z
-informacją licencyjną do gotowego wydania.
+Run `tools/package_release.sh EXPORT_DIRECTORY` to copy assets and license
+notices into an exported release. Record external assets in
+`assets/asset_manifest.json` and keep license texts in `assets/licenses/`.
+Private sharing does not waive the creator's rights. Use your own assets or
+material licensed for redistribution, and comply with attribution,
+ShareAlike and commercial-use conditions. The manifest organizes notices;
+it does not automatically verify rights.
 
-Każdy zewnętrzny asset należy opisać w `assets/asset_manifest.json`, a tekst
-licencji zachować w `assets/licenses/`. Prywatne udostępnianie również nie
-unieważnia praw autora. Do publikacji używaj własnych plików albo takich, których
-licencja wyraźnie pozwala na redystrybucję (i spełnij wymagania atrybucji,
-ShareAlike oraz ograniczenia komercyjne). To mechanizm organizacyjny, nie
-automatyczna weryfikacja prawna.
+The packaging script also includes `GODOT_COPYRIGHT.txt`, covering the
+engine and libraries in the official export template. Refresh it with:
 
-Skrypt pakujący dodaje też `GODOT_COPYRIGHT.txt` z licencją silnika i
-informacjami o bibliotekach w oficjalnym szablonie eksportu. Plik można
-odświeżyć poleceniem
-`godot --headless --path . --script tools/generate_godot_notice.gd`.
+```sh
+godot --headless --path . --script tools/generate_godot_notice.gd
+```
 
-## Ustawienia dźwięku
+## Audio settings
 
-Menu **Ustawienia dźwięku** zawiera główną głośność, głośność efektów i
-osobną głośność muzyki oraz wyciszenie. Średniowieczne utwory z
-`sounds/music/Medival Theme/` są tasowane; wszystkie cztery są odtwarzane raz
-na cykl, bez natychmiastowego powtórzenia. Wartości zapisują się w
-`user://farkle_progress.cfg`.
+**Sound settings** provides master, effects and music volume controls, plus
+mute. The four medieval tracks in `sounds/music/Medival Theme/` are shuffled
+and played once per cycle without immediate repetition. Settings are saved
+in `user://farkle_progress.cfg`.
 
-Proceduralna karczma losuje przy każdym uruchomieniu siedem lekkich modeli
-dekoracji: tarcze, miecze, chorągwie, skrzynie, worki i gliniane dzbany.
-Nie wymagają one dodatkowych plików ani licencji.
+The procedural tavern randomizes lightweight decorations, including shields,
+swords, banners, chests, sacks and clay jugs. They need no additional asset
+files or third-party licenses.
 
-## Motywy, postać i boty
+## Themes, characters and bots
 
-Menu gry pozwala wybrać jeden z trzech proceduralnych motywów o innym świetle
-i palecie: karczmę przy trakcie, królewską ucztę albo leśny zajazd. Kreator
-postaci zmienia karnację oraz kolory tuniki i włosów modelu proceduralnego;
-zewnętrzne modele GLB/GLTF zachowują własne materiały.
+Choose from three procedural themes with different lighting and palettes:
+a roadside tavern, a royal feast and a forest inn. The character creator
+changes skin, tunic and hair colors for procedural models; external GLB/GLTF
+models retain their own materials.
 
-W grze solo dostępnych jest pięć gotowych profili przeciwnika. Imię i poziom
-trudności można zmienić niezależnie od profilu. Iwo oraz Wawrzyn analizują
-szacowane prawdopodobieństwo Farkle i oczekiwany zysk następnego rzutu.
-Wawrzyn korzysta z sześciu najmocniejszych kości hazardowych. Profil
-**Twój Sobowtór** kopiuje model, kolory i zestaw kości gracza, a jego próg
-ryzyka dostosowuje się lokalnie do średniej wartości, przy której gracz
-bankuje lub kontynuuje. Statystyki nauki są przechowywane wyłącznie w
-`user://farkle_progress.cfg`; gra nie wysyła ich do sieci.
+Solo play offers five opponent profiles. Names and difficulty can be changed
+independently of the profile. The tactician and champion estimate the chance
+of a Farkle and the expected value of another roll. The champion uses six of
+the strongest gambling dice.
 
-## Wydanie na Game Jolt
+**Your Mirror** copies your model, colors and dice loadout. Its risk
+threshold adapts locally to the average score at which you bank or continue.
+Learning statistics stay in `user://farkle_progress.cfg` and are not sent
+over the network.
 
-Skrypt `tools/package_gamejolt.sh 0.8.0-alpha` eksportuje i pakuje osobne wydania
-Linux oraz Windows do `build/gamejolt/0.8.0-alpha/`. Wymaga Godot 4.7.2 z
-zainstalowanymi szablonami eksportu i programu `zip`.
-Wersja **0.8 Alpha** jest wydaniem przedpremierowym (pre-release), z nieukończoną
-kampanią i trwającym reworkiem modeli.
+## Packaging a Game Jolt release
 
-## Testy
+Run `tools/package_gamejolt.sh 0.8.0-alpha` to export and package separate
+Linux and Windows builds in `build/gamejolt/0.8.0-alpha/`. This requires
+Godot 4.7.2 with export templates installed, plus `zip`.
+
+**0.8 Alpha** is a pre-release: the campaign is unfinished and character
+models are being reworked.
+
+## Tests
 
 ```sh
 godot --headless --path . --script tests/rules_test.gd
@@ -234,10 +239,9 @@ godot --headless --path . --script tests/localization_test.gd
 godot --headless --path . --script tests/game_smoke_test.gd
 ```
 
-Test transportu uruchamia równocześnie dwie instancje
-`tests/network_loopback_test.gd`: hosta z argumentem `host` i klienta z
-argumentem `client`.
+The transport test runs two instances of `tests/network_loopback_test.gd`
+at the same time: one with the `host` argument and one with `client`.
 
-Wagi specjalnych kości pochodzą z publicznej tabeli
-[KCD Wiki — Dice](https://kingdomcomedeliverance.wiki.gg/wiki/Dice). Grafika i
-kod projektu są oryginalne i nie korzystają z modeli ani dźwięków gry KCD.
+Special-dice weights are based on the public
+[KCD Wiki — Dice](https://kingdomcomedeliverance.wiki.gg/wiki/Dice) table.
+The project's original art and code do not use models or sounds from KCD.

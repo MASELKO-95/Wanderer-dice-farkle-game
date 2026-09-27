@@ -1,47 +1,49 @@
-# Ręczne dodawanie dialogów
+# Adding dialogue manually
 
-Każdy rozdział kampanii ma własny plik `chapter_XX.tres`. Otwórz go w Godot
-i edytuj trzy listy w Inspectorze:
+Each campaign chapter has its own `chapter_XX.tres` file. Open it in Godot
+and edit these three lists in the Inspector:
 
-- `Intro Lines` — rozmowa przed pojedynkiem;
-- `Victory Lines` — rozmowa po wygranej gracza;
-- `Defeat Lines` — rozmowa po przegranej gracza.
+- `Intro Lines` — dialogue before the match.
+- `Victory Lines` — dialogue after the player wins.
+- `Defeat Lines` — dialogue after the player loses.
 
-Do listy dodaj zasób `DialogueLine`. Najważniejsze pola:
+Add a `DialogueLine` resource to a list. Its main fields are:
 
-- `Speaker` i `Text` — własny tekst wpisany bezpośrednio;
-- `Speaker Key` i `Text Key` — klucze z `translation/translations.json`;
-- `Portrait Id` — np. `builtin:king`, `builtin:princess`, `builtin:thief`;
-- `Portrait Side` — `left`, `right` albo `narrator`;
-- `Backdrop` — `tavern`, `royal` albo `forest`;
-- `Characters Per Second` — szybkość pojawiania się tekstu.
+- `Speaker` and `Text` — text entered directly.
+- `Speaker Key` and `Text Key` — keys in `translation/translations.json`.
+- `Portrait Id` — for example, `builtin:king`, `builtin:princess` or `builtin:thief`.
+- `Portrait Side` — `left`, `right` or `narrator`.
+- `Backdrop` — `tavern`, `royal` or `forest`.
+- `Characters Per Second` — text reveal speed.
 
-Jeśli podasz jednocześnie tekst i klucz tłumaczenia, użyty zostanie klucz.
+If both text and a translation key are provided, the key takes precedence.
 
-## Wybory i zakończenia
+## Choices and endings
 
-W polu `Choices` kwestii dodaj zasób `DialogueChoice`:
+Add a `DialogueChoice` resource to a line's `Choices` field:
 
-- `Text` / `Text Key` — treść odpowiedzi;
-- `Id` — trwały identyfikator decyzji, zapisywany w historii wybranej kampanii;
-- `Next Line Index` — numer następnej kwestii (liczony od zera);
-- `Ending Id` — kończy dialog i zapisuje zakończenie kampanii.
+- `Text` / `Text Key` — the response text.
+- `Id` — a persistent choice identifier stored in the campaign history.
+- `Next Line Index` — the next line's index, starting at zero.
+- `Ending Id` — ends the dialogue and records a campaign ending.
 
-Rozdział 12 zawiera gotowy przykład trzech zakończeń: `princess`, `emperor`
-i `world_champion`. Możesz skopiować te wybory do innych rozdziałów albo
-dodać własne identyfikatory i obsłużyć je w `scripts/main.gd`.
+Chapter 12 includes examples of three endings: `princess`, `emperor` and
+`world_champion`. You can copy these choices to other chapters or add your
+own identifiers and handle them in `scripts/main.gd`.
 
-Spacja lub Enter odsłania tekst i przechodzi dalej. Escape oraz przycisk
-„Pomiń” pomijają tekst, ale zatrzymują się na wyborze — nie omijają decyzji
-o zakończeniu. `Allow Skip = false` wyłącza pomijanie rozmowy.
+Space or Enter reveals text and advances the dialogue. Escape and **Skip**
+skip text but stop at choices, so ending decisions cannot be skipped.
+Set `Allow Skip = false` to disable dialogue skipping.
 
-Kampania ma sześć osobnych zapisów. Każdy przechowuje historię decyzji
-(`chapter`, `section`, `choice`) i punkt wznowienia (`chapter`, `section`, `line`).
-Przycisk **Zapisz osobną ścieżkę** w dialogu tworzy kopię w pustym miejscu.
-Wczytanie tej kopii odtwarza rozmowę przed decyzją; inne zakończenie nie zmienia
-oryginalnego zapisu. Kopie nie nadpisują istniejących zapisów.
+The campaign has six separate save slots. Each stores choice history
+(`chapter`, `section`, `choice`) and a resume point (`chapter`, `section`,
+`line`). **Save a separate path** copies the current dialogue progress into
+an empty slot. Loading the copy returns to the dialogue before the choice;
+exploring another ending does not change the original save. Copies never
+overwrite existing saves.
 
-Rozmowę o zakładzie buduje `scripts/wager_dialogue.gd`: propozycja przeciwnika,
-odpowiedź gracza ze stawką, potwierdzenie warunków oraz zgoda lub renegocjacja.
-Można też zagrać bez zakładu albo odejść. Srebro jest pobierane dopiero na początku
-meczu. Dostępność i limity pozostają osobne dla przeciwników w `CampaignCatalog`.
+`scripts/wager_dialogue.gd` builds wager negotiations: the opponent's offer,
+the player's proposed stake, confirmation of terms, and agreement or
+renegotiation. Players can also play without a wager or leave. Silver is
+deducted only when the match starts. Availability and limits are configured
+separately for each opponent in `CampaignCatalog`.

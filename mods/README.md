@@ -1,12 +1,12 @@
-# Mody modeli i dźwięków
+# Model and sound mods
 
-Po eksporcie katalog `mods` połóż obok pliku wykonywalnego gry. W edytorze
-korzystaj z tego katalogu bezpośrednio w projekcie.
+For exported builds, place the `mods` directory beside the game executable.
+In the editor, use this directory inside the project.
 
-Najprostsza struktura moda:
+A basic mod structure:
 
 ```text
-mods/moj_mod/
+mods/my_mod/
 ├── mod.json
 ├── sounds/
 │   ├── dice_roll.ogg
@@ -17,43 +17,44 @@ mods/moj_mod/
 │   ├── ui_click.ogg
 │   └── ui_hover.ogg
 └── models/
-	├── rycerz.glb
-	└── source/
-	    └── kupiec.fbx
+    ├── knight.glb
+    └── source/
+        └── merchant.fbx
 ```
 
-Każdy dźwięk może być zapisany jako prawdziwy Ogg Vorbis (`.ogg`) albo MP3
-(`.mp3`). Nie trzeba dodawać wszystkich dźwięków. Brakujące efekty zostaną pobrane z
-domyślnej paczki. Każdy plik GLB, GLTF albo FBX w katalogu `models` lub jego
-podkatalogach pojawi się na liście modeli gracza. Tekstury zachowaj w układzie
-folderów oczekiwanym przez model, np. `models/textures/` obok `models/source/`.
+Sounds can be real Ogg Vorbis (`.ogg`) or MP3 (`.mp3`) files. You do not
+need to supply every effect; missing sounds use the default pack. Each GLB,
+GLTF or FBX file under `models/`, including subdirectories, appears in the
+player model list. Keep textures in the directory layout expected by the
+model, such as `models/textures/` beside `models/source/`.
 
-Gra nie czyta modeli bezpośrednio z ZIP-a. Archiwum trzeba rozpakować tak, aby
-powstał folder `mods/nazwa_moda/models/`. Po dodaniu plików kliknij w menu
-**Odśwież mody** albo uruchom grę ponownie.
+The game does not load models directly from ZIP archives. Extract them so
+the resulting path is `mods/mod_name/models/`. After adding files, select
+**Refresh mods** in the menu or restart the game.
 
-Sama zmiana końcówki z `.mp3` na `.ogg` nie konwertuje dźwięku. Gra rozpozna
-taki plik po zawartości i go odtworzy, ale pokaże ostrzeżenie, aby poprawić nazwę.
+Changing an extension from `.mp3` to `.ogg` does not convert the audio.
+The game identifies and plays the file by its contents, but warns you to
+correct the filename.
 
-Plik `mod.json` jest opcjonalny:
+The `mod.json` file is optional:
 
 ```json
 {
-  "name": "Mój pakiet karczemny",
+  "name": "My Tavern Pack",
   "version": "1.0",
-  "author": "Autor",
+  "author": "Creator",
   "license": "CC0-1.0",
   "source_url": "https://example.com",
   "enabled": true
 }
 ```
 
-Modele postaci powinny mieć stopy na poziomie Y=0 i przód skierowany w stronę
-osi +Z. Gra automatycznie wyrównuje ich wysokość i ustawia je przy odpowiednim
-miejscu stołu. Dla najlepszego widoku pierwszoosobowego szkielet powinien mieć
-kości `Arm_L`, `Elbow_L`, `Arm_R`, `Elbow_R` (obsługiwane są też popularne nazwy
-`UpperArm`/`ForeArm`). Wtedy gracz widzi własne ręce, a głowa modelu nie zasłania
-kamery.
+Character models should have their feet at Y=0 and face the +Z axis.
+The game adjusts their height automatically and places them at the correct
+seat. For the best first-person view, the skeleton should have `Arm_L`,
+`Elbow_L`, `Arm_R` and `Elbow_R` bones. Common `UpperArm`/`ForeArm` names
+are also supported. This lets players see their own arms while keeping the
+model's head out of the camera.
 
-Gra nie omija licencji moda. Osoba udostępniająca lub publikująca paczkę musi
-mieć prawa do modeli i dźwięków oraz zachować wymagane informacje o autorach.
+The game does not override mod licenses. Anyone sharing a pack must have the
+necessary rights to its models and sounds and retain required attribution.

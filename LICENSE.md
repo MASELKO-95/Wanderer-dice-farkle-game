@@ -1,73 +1,61 @@
-# Licencja projektu / Project license
+# Project license
 
 Copyright © 2026 MASELKO-95
 
-O ile przy konkretnym pliku lub materiale nie podano inaczej, oryginalne
-elementy projektu **Wanderer dice farkle game** — w tym kod źródłowy, teksty,
-oryginalna grafika i proceduralne modele 3D — są udostępniane na licencji
+Unless a particular file or asset states otherwise, the original material in
+**Wanderer dice farkle game** — including source code, text, original artwork
+and procedural 3D models — is licensed under
 [Creative Commons Attribution-NonCommercial 4.0 International
 (CC BY-NC 4.0)](https://creativecommons.org/licenses/by-nc/4.0/).
 
-Pełny tekst prawny licencji:
+Full legal code:
 <https://creativecommons.org/licenses/by-nc/4.0/legalcode>
 
-Identyfikator SPDX: `CC-BY-NC-4.0`
+SPDX identifier: `CC-BY-NC-4.0`
 
-## Co wolno
+## Permissions and attribution
 
-W zakresie udzielonym przez licencję możesz kopiować, rozpowszechniać,
-modyfikować i rozwijać objęte nią materiały, ale wyłącznie do celów
-niekomercyjnych.
+Within the rights granted by the license, you may copy, share, modify and
+build upon the licensed material for noncommercial purposes only.
 
-Przy udostępnianiu oryginału lub zmodyfikowanej wersji należy:
+When sharing the original or a modified version:
 
-- wskazać tytuł projektu: **Wanderer dice farkle game**;
-- wskazać twórcę: **MASELKO-95**;
-- podać źródło (oryginalne repozytorium albo stronę wydania);
-- zamieścić link do licencji CC BY-NC 4.0;
-- wyraźnie zaznaczyć, czy i jakie zmiany zostały wykonane;
-- nie sugerować, że autor popiera zmodyfikowaną wersję lub sposób jej użycia.
+- Credit the project: **Wanderer dice farkle game**.
+- Credit the creator: **MASELKO-95**.
+- Provide the source (the original repository or release page).
+- Include a link to CC BY-NC 4.0.
+- Indicate whether you made changes and describe them.
+- Do not imply that the creator endorses your version or use.
 
-Przykładowa atrybucja:
+Example attribution:
 
 > Based on "Wanderer dice farkle game" by MASELKO-95, licensed under
 > [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/).
 > Source: [link]. Changes: [description].
 
-„Niekomercyjne” oznacza użycie, które nie jest przede wszystkim nastawione na
-korzyść handlową ani wynagrodzenie pieniężne. Licencja nie udziela zgody na
-sprzedaż projektu ani wykorzystywanie objętych nią materiałów w płatnych lub
-komercyjnych produktach i usługach. W razie wątpliwości lub chęci użycia
-komercyjnego skontaktuj się z autorem w celu uzyskania osobnej zgody.
+Noncommercial use is use that is not primarily intended for commercial
+advantage or monetary compensation. This license does not grant permission
+to sell the project or use the licensed material in commercial products or
+services. Contact the creator for separate permission if you wish to use
+it commercially or are unsure whether your intended use qualifies.
 
-## Zakres i wyjątki
+## Scope and exceptions
 
-Licencja CC BY-NC 4.0 obejmuje wyłącznie te prawa, które MASELKO-95 może
-udzielić. Nie zastępuje licencji materiałów osób trzecich i nie obejmuje
-automatycznie modów tworzonych przez użytkowników.
+CC BY-NC 4.0 covers only rights that MASELKO-95 is authorized to grant.
+It does not replace third-party licenses or automatically apply to mods
+made by users.
 
-W szczególności:
+In particular:
 
-- muzyka i pozostałe materiały zewnętrzne zachowują własne licencje opisane w
-  [`THIRD_PARTY_ASSETS.md`](THIRD_PARTY_ASSETS.md) oraz
-  [`assets/asset_manifest.json`](assets/asset_manifest.json);
-- efekty dźwiękowe oznaczone w manifeście jako CC0 pozostają dostępne na CC0;
-- Godot Engine oraz jego komponenty zachowują licencje wymienione w
-  [`GODOT_COPYRIGHT.txt`](GODOT_COPYRIGHT.txt);
-- zewnętrzne mody, modele, tekstury i dźwięki podlegają licencjom wskazanym
-  przez ich twórców;
-- licencja nie udziela praw do znaków towarowych, wizerunku, prywatności ani
-  innych praw, których autor nie może udzielić.
+- Music and other external assets retain the licenses listed in
+  [`THIRD_PARTY_ASSETS.md`](THIRD_PARTY_ASSETS.md) and
+  [`assets/asset_manifest.json`](assets/asset_manifest.json).
+- Sound effects marked CC0 in the manifest remain available under CC0.
+- Godot Engine and its components retain the licenses listed in
+  [`GODOT_COPYRIGHT.txt`](GODOT_COPYRIGHT.txt).
+- External mods, models, textures and sounds remain subject to their
+  creators' licenses.
+- This license does not grant trademark, publicity, privacy or other rights
+  that the creator is not authorized to grant.
 
-Pełny tekst prawny CC BY-NC 4.0 ma pierwszeństwo przed tym objaśnieniem.
-
----
-
-Unless a particular file or asset states otherwise, the original material in
-**Wanderer dice farkle game** is licensed under the
-[Creative Commons Attribution-NonCommercial 4.0 International License
-(CC BY-NC 4.0)](https://creativecommons.org/licenses/by-nc/4.0/).
-
-Third-party assets, CC0 sound effects, Godot Engine components, and user-made
-mods remain under their respective terms listed in the files linked above.
 The full CC BY-NC 4.0 legal code takes precedence over this summary.

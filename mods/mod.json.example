@@ -1,7 +1,7 @@
 {
-  "name": "Nazwa moda",
+  "name": "Mod name",
   "version": "1.0",
-  "author": "Autor",
+  "author": "Creator",
   "license": "CC0-1.0",
   "source_url": "https://example.com",
   "enabled": true

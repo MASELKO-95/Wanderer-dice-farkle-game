@@ -1,18 +1,18 @@
-# Licencje assetów
+# Asset licenses
 
-Główna licencja projektu CC BY-NC 4.0 nie zastępuje licencji zapisanych w tym
-katalogu ani w `assets/asset_manifest.json`. Każdy materiał zewnętrzny zachowuje
-warunki nadane przez jego autora lub dostawcę.
+The project's CC BY-NC 4.0 license does not replace the licenses recorded
+here or in `assets/asset_manifest.json`. Each external asset retains the
+terms set by its creator or provider.
 
-Umieszczaj tutaj kopie licencji i wymagane informacje o autorach zewnętrznych
-modeli, tekstur i dźwięków.
+Keep copies of licenses and required attribution for external models,
+textures and sounds in this directory.
 
-Samo użycie prywatne nie usuwa praw autora. Do wspólnego grania używaj tylko
-plików własnych, kupionych z prawem do takiego użycia albo objętych licencją,
-która na to pozwala. Przed publikacją sprawdź osobno prawo do modyfikacji,
-redystrybucji i użycia komercyjnego oraz wymagania dotyczące atrybucji.
+Private use does not remove the creator's rights. When sharing the game,
+use your own files or assets whose purchase terms or licenses permit that
+use. Before publishing, check modification, redistribution, commercial-use
+and attribution requirements separately.
 
-Najprostsze do publicznej dystrybucji są własne assety albo CC0. Licencje CC BY
-zwykle wymagają wskazania autora; CC BY-SA może wymagać udostępniania zmian na
-tej samej licencji. Asset bez jasnego źródła i licencji nie powinien trafić do
-publicznego wydania.
+Your own assets and CC0 assets are straightforward options for public
+distribution. CC BY requires attribution; CC BY-SA may require adaptations
+to use the same license. Do not include an asset in a public release without
+a clear source and license.
