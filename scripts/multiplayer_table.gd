@@ -1,6 +1,8 @@
 class_name MultiplayerTable
 extends Control
 
+const STORY_TEXT := preload("res://scripts/story_text.gd")
+
 signal leave_requested
 signal sfx_requested(name: String)
 
@@ -11,6 +13,7 @@ const MUTED := Color("#b8a98e")
 const GREEN := Color("#597a43")
 const RED := Color("#9d493b")
 
+var developer_console: CanvasLayer
 var session: NetworkSession
 var world: TavernWorld
 var config: Dictionary
@@ -69,7 +72,38 @@ func _exit_tree() -> void:
 		session.opponent_disconnected.disconnect(_on_peer_disconnected)
 
 
+var keyboard_die := 0
+
+
+func _input(event: InputEvent) -> void:
+	if is_instance_valid(developer_console) and developer_console.is_open():
+		return
+	if match_state == null or not match_state.can_control(session.local_peer_id()) or match_state.phase != TableMatch.PHASE_SELECT:
+		return
+	if not event is InputEventKey or not event.pressed or event.echo:
+		return
+	if event.alt_pressed or event.ctrl_pressed or event.meta_pressed:
+		return
+	var count := match_state.current_dice.size()
+	if count == 0:
+		return
+	keyboard_die = clampi(keyboard_die, 0, count - 1)
+	if event.keycode in [KEY_LEFT, KEY_UP, KEY_RIGHT, KEY_DOWN]:
+		keyboard_die = posmod(keyboard_die + (-1 if event.keycode in [KEY_LEFT, KEY_UP] else 1), count)
+	elif event.keycode in [KEY_Z, KEY_SPACE, KEY_ENTER, KEY_KP_ENTER]:
+		_on_die_pressed(keyboard_die)
+	else:
+		return
+	for child in dice_row.get_children():
+		if child is DieView and not child.is_queued_for_deletion():
+			child.keyboard_cursor = child.die_index == keyboard_die
+			child.queue_redraw()
+	get_viewport().set_input_as_handled()
+
+
 func _unhandled_key_input(event: InputEvent) -> void:
+	if is_instance_valid(developer_console) and developer_console.is_open():
+		return
 	if not event is InputEventKey or not event.pressed or event.echo:
 		return
 	if event.keycode == KEY_SPACE and is_instance_valid(roll_button) and not roll_button.disabled:
@@ -81,7 +115,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	elif event.keycode == KEY_F and is_instance_valid(keep_button) and not keep_button.disabled:
 		_request_action("keep")
 		get_viewport().set_input_as_handled()
-	elif event.keycode in [KEY_Q, KEY_ENTER] and is_instance_valid(bank_button) and not bank_button.disabled:
+	elif event.keycode in [KEY_Q] and is_instance_valid(bank_button) and not bank_button.disabled:
 		_request_action("bank")
 		get_viewport().set_input_as_handled()
 
@@ -112,7 +146,7 @@ func _build_ui() -> void:
 		var box := VBoxContainer.new()
 		box.alignment = BoxContainer.ALIGNMENT_CENTER
 		card.add_child(box)
-		var name_label := _label("Wolne miejsce", 16, MUTED, HORIZONTAL_ALIGNMENT_CENTER)
+		var name_label := _label(STORY_TEXT.text("Wolne miejsce"), 16, MUTED, HORIZONTAL_ALIGNMENT_CENTER)
 		var score_label := _label("—", 22, PALE_GOLD, HORIZONTAL_ALIGNMENT_CENTER)
 		box.add_child(name_label)
 		box.add_child(score_label)
@@ -132,7 +166,7 @@ func _build_ui() -> void:
 	play.add_theme_constant_override("separation", 8)
 	play_panel.add_child(play)
 
-	status_label = _label("STÓŁ SIECIOWY", 25, GOLD, HORIZONTAL_ALIGNMENT_CENTER)
+	status_label = _label(STORY_TEXT.text("STÓŁ SIECIOWY"), 25, GOLD, HORIZONTAL_ALIGNMENT_CENTER)
 	turn_label = _label("", 17, CREAM, HORIZONTAL_ALIGNMENT_CENTER)
 	play.add_child(status_label)
 	play.add_child(turn_label)
@@ -147,7 +181,7 @@ func _build_ui() -> void:
 	dice_center.add_child(dice_row)
 
 	hint_label = _label("", 15, MUTED, HORIZONTAL_ALIGNMENT_CENTER)
-	kept_label = _label("Odłożone: —", 14, PALE_GOLD, HORIZONTAL_ALIGNMENT_CENTER)
+	kept_label = _label(STORY_TEXT.text("Odłożone: —"), 14, PALE_GOLD, HORIZONTAL_ALIGNMENT_CENTER)
 	play.add_child(hint_label)
 	play.add_child(kept_label)
 
@@ -155,9 +189,9 @@ func _build_ui() -> void:
 	actions.alignment = BoxContainer.ALIGNMENT_CENTER
 	actions.add_theme_constant_override("separation", 10)
 	play.add_child(actions)
-	roll_button = _button("RZUĆ  [SPACJA]", Color("#6f5430"), 180)
-	keep_button = _button("ODŁÓŻ I RZUĆ  [F]", Color("#6f5430"), 190)
-	bank_button = _button("ZAPISZ  [Q]", GREEN, 170)
+	roll_button = _button(STORY_TEXT.text("RZUĆ  [SPACJA]"), Color("#6f5430"), 180)
+	keep_button = _button(STORY_TEXT.text("ODŁÓŻ I RZUĆ  [F]"), Color("#6f5430"), 190)
+	bank_button = _button(STORY_TEXT.text("ZAPISZ  [Q]"), GREEN, 170)
 	roll_button.pressed.connect(_request_action.bind("roll", {}))
 	keep_button.pressed.connect(_request_action.bind("keep", {}))
 	bank_button.pressed.connect(_request_action.bind("bank", {}))
@@ -172,12 +206,12 @@ func _build_ui() -> void:
 	var log_box := VBoxContainer.new()
 	log_box.add_theme_constant_override("separation", 7)
 	log_panel.add_child(log_box)
-	log_box.add_child(_label("PRZEBIEG GRY", 15, GOLD, HORIZONTAL_ALIGNMENT_CENTER))
+	log_box.add_child(_label(STORY_TEXT.text("PRZEBIEG GRY"), 15, GOLD, HORIZONTAL_ALIGNMENT_CENTER))
 	history_box = VBoxContainer.new()
 	history_box.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	log_box.add_child(history_box)
 	var leave := Button.new()
-	leave.text = "Opuść stół"
+	leave.text = STORY_TEXT.text("Opuść stół")
 	leave.flat = true
 	leave.add_theme_color_override("font_color", MUTED)
 	leave.pressed.connect(func() -> void: leave_requested.emit())
@@ -236,9 +270,7 @@ func _on_peer_disconnected(peer_id: int) -> void:
 			seat.peer_id = -1000 - int(seat.seat)
 			seat.is_bot = true
 			seat.nickname = "%s (bot)" % seat.nickname
-			match_state.revision += 1
-			match_state.event_id += 1
-			match_state.last_event = "%s rozłączył się — miejsce przejmuje bot." % seat.nickname
+			match_state._touch([{ "text": "%s rozłączył się — miejsce przejmuje bot.", "args": [seat.nickname] }])
 			_publish_state()
 			_schedule_bot()
 			return
@@ -342,7 +374,7 @@ func _render_state(force_throw := false) -> void:
 		if occupied:
 			var seat := match_state.seats[index]
 			seat_name_labels[index].text = ("%s 🤖" % seat.nickname) if seat.is_bot else str(seat.nickname)
-			seat_score_labels[index].text = "%d pkt" % int(seat.score)
+			seat_score_labels[index].text = STORY_TEXT.text("%d pkt") % int(seat.score)
 			var active := index == match_state.active_seat and match_state.phase != TableMatch.PHASE_GAME_OVER
 			seat_cards[index].add_theme_stylebox_override("panel", _panel_style(
 				Color("#2c1c12ee") if active else Color("#20140ddd"),
@@ -351,15 +383,15 @@ func _render_state(force_throw := false) -> void:
 				10
 			))
 		else:
-			seat_name_labels[index].text = "Wolne miejsce"
+			seat_name_labels[index].text = STORY_TEXT.text("Wolne miejsce")
 			seat_score_labels[index].text = "—"
 
 	if match_state.seats.is_empty():
 		return
 	var active := match_state.active_player()
-	status_label.text = ("ZWYCIĘŻA %s!" % match_state.seats[match_state.winner_seat].nickname) if match_state.phase == TableMatch.PHASE_GAME_OVER else "TURA: %s" % active.nickname
-	turn_label.text = "Punkty w turze: %d  •  Cel: %d" % [match_state.turn_score, match_state.target_score]
-	kept_label.text = "Odłożone: %s" % _dice_text(match_state.kept)
+	status_label.text = (STORY_TEXT.text("ZWYCIĘŻA %s!") % match_state.seats[match_state.winner_seat].nickname) if match_state.phase == TableMatch.PHASE_GAME_OVER else STORY_TEXT.text("TURA: %s") % active.nickname
+	turn_label.text = STORY_TEXT.text("Punkty w turze: %d  •  Cel: %d") % [match_state.turn_score, match_state.target_score]
+	kept_label.text = STORY_TEXT.text("Odłożone: %s") % _dice_text(match_state.kept)
 
 	var local_can_play := match_state.can_control(session.local_peer_id())
 	var selection := match_state.selected_result()
@@ -368,16 +400,16 @@ func _render_state(force_throw := false) -> void:
 	bank_button.disabled = keep_button.disabled
 	match match_state.phase:
 		TableMatch.PHASE_AWAIT_ROLL:
-			hint_label.text = "Rzuć kośćmi." if local_can_play else ("Bot myśli…" if active.is_bot else "Czekaj na ruch gracza.")
+			hint_label.text = STORY_TEXT.text("Rzuć kośćmi.") if local_can_play else (STORY_TEXT.text("Bot myśli…") if active.is_bot else STORY_TEXT.text("Czekaj na ruch gracza."))
 		TableMatch.PHASE_SELECT:
 			if local_can_play:
-				hint_label.text = "+%d pkt • %s" % [selection.score, selection.label] if selection.valid else "Wybierz punktujące kości."
+				hint_label.text = STORY_TEXT.text("+%d pkt • %s") % [selection.score, selection.label] if selection.valid else STORY_TEXT.text("Wybierz punktujące kości.")
 			else:
-				hint_label.text = "Wybieranie kości…"
+				hint_label.text = STORY_TEXT.text("Wybieranie kości…")
 		TableMatch.PHASE_FARKLE:
-			hint_label.text = "FARKLE — punkty z tury przepadają."
+			hint_label.text = STORY_TEXT.text("FARKLE — punkty z tury przepadają.")
 		TableMatch.PHASE_GAME_OVER:
-			hint_label.text = "Mecz zakończony."
+			hint_label.text = STORY_TEXT.text("Mecz zakończony.")
 
 	_render_dice()
 	if (force_throw or _rendered_roll_id != match_state.roll_id) and not match_state.current_dice.is_empty():
@@ -388,10 +420,11 @@ func _render_state(force_throw := false) -> void:
 
 	if match_state.event_id != _rendered_event_id:
 		_rendered_event_id = match_state.event_id
-		_add_history(match_state.last_event, RED if match_state.phase == TableMatch.PHASE_FARKLE else CREAM)
+		_add_history(match_state.event_text(), RED if match_state.phase == TableMatch.PHASE_FARKLE else CREAM)
 
 
 func _render_dice() -> void:
+	keyboard_die = clampi(keyboard_die, 0, maxi(0, match_state.current_dice.size() - 1))
 	for child in dice_row.get_children():
 		child.queue_free()
 	for index in range(match_state.current_dice.size()):
@@ -399,6 +432,7 @@ func _render_dice() -> void:
 		var locked := not match_state.can_control(session.local_peer_id()) or match_state.phase != TableMatch.PHASE_SELECT
 		die.configure(index, match_state.current_dice[index], match_state.current_types[index], locked)
 		die.set_selected(index in match_state.selected)
+		die.keyboard_cursor = index == keyboard_die
 		die.die_pressed.connect(_on_die_pressed)
 		die.custom_minimum_size = Vector2(70, 70)
 		dice_row.add_child(die)
@@ -450,3 +484,25 @@ func _panel_style(background: Color, border: Color, width: int, radius: int) -> 
 	style.set_border_width_all(width)
 	style.set_corner_radius_all(radius)
 	return style
+
+
+func console_finish_match(player_won: bool) -> String:
+	if not _is_host:
+		return STORY_TEXT.text("W multiplayer wynik może zmienić tylko host.")
+	if match_state.phase == TableMatch.PHASE_GAME_OVER:
+		return STORY_TEXT.text("Mecz już zakończony.")
+	var winner := -1
+	for index in range(match_state.seats.size()):
+		var is_local := int(match_state.seats[index].peer_id) == session.local_peer_id()
+		if is_local == player_won:
+			winner = index
+			break
+	if winner < 0:
+		return STORY_TEXT.text("Brak przeciwnika.")
+	_flow_token += 1
+	match_state.seats[winner].score = match_state.target_score
+	match_state.winner_seat = winner
+	match_state.phase = TableMatch.PHASE_GAME_OVER
+	match_state._touch([{ "text": "Konsola: wygrywa %s.", "args": [match_state.seats[winner].nickname] }])
+	_publish_state()
+	return match_state.last_event

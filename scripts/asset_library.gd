@@ -1,6 +1,8 @@
 class_name AssetLibrary
 extends RefCounted
 
+const STORY_TEXT := preload("res://scripts/story_text.gd")
+
 const PACKAGED_ROOT := "res://assets"
 const LEGACY_SOUND_ROOT := "res://sounds"
 const MOD_MANIFEST := "mod.json"
@@ -43,28 +45,28 @@ static func mods_root() -> String:
 static func refresh_mod_catalog() -> Dictionary:
 	last_warnings.clear()
 	var models: Array[Dictionary] = [
-		{"id": "procedural", "label_key": "default_character", "path": "", "mod": "Gra"}
+		{"id": "procedural", "label_key": "default_character", "path": "", "mod": STORY_TEXT.text("Gra")}
 	]
 	for builtin: Dictionary in BUILTIN_AVATARS:
-		models.append({"id": builtin.id, "label_key": builtin.label_key, "path": "", "mod": "Gra"})
+		models.append({"id": builtin.id, "label_key": builtin.label_key, "path": "", "mod": STORY_TEXT.text("Gra")})
 	var sound_packs: Array[Dictionary] = [
-		{"id": "builtin", "label": "Domyślne dźwięki", "path": "", "mod": "Gra"}
+		{"id": "builtin", "label": STORY_TEXT.text("Domyślne dźwięki"), "path": "", "mod": STORY_TEXT.text("Gra")}
 	]
 	var seen_models := {"procedural": true}
 	for builtin: Dictionary in BUILTIN_AVATARS:
 		seen_models[builtin.id] = true
 	var seen_packs := {"builtin": true}
 	
-	_scan_asset_models(external_root().path_join("models"), "asset", "Własne assety", models, seen_models)
+	_scan_asset_models(external_root().path_join("models"), "asset", STORY_TEXT.text("Własne assety"), models, seen_models)
 	if not OS.has_feature("editor"):
-		_scan_asset_models(PACKAGED_ROOT.path_join("models"), "asset_packed", "Assety w PCK", models, seen_models)
+		_scan_asset_models(PACKAGED_ROOT.path_join("models"), "asset_packed", STORY_TEXT.text("Assety w PCK"), models, seen_models)
 	
 	# NOWE: Skanuj mody tylko jeśli są włączone
 	if mods_enabled:
 		for root_path in [mods_root(), ProjectSettings.globalize_path("user://mods")]:
 			_scan_mod_root(root_path, models, sound_packs, seen_models, seen_packs)
 	else:
-		last_warnings.append("Mody są wyłączone w ustawieniach głównych.")
+		last_warnings.append(STORY_TEXT.text("Mody są wyłączone w ustawieniach głównych."))
 		
 	_catalog = {"models": models, "sound_packs": sound_packs, "warnings": last_warnings.duplicate()}
 	return _catalog.duplicate(true)
@@ -159,7 +161,7 @@ static func _load_external_sound(path: String) -> AudioStream:
 		return null
 	var file := FileAccess.open(path, FileAccess.READ)
 	if file == null:
-		_warn_once("Nie można otworzyć dźwięku: %s" % path)
+		_warn_once(STORY_TEXT.text("Nie można otworzyć dźwięku: %s") % path)
 		return null
 	var header := file.get_buffer(4)
 	if header.size() >= 4 and header[0] == 0x4f and header[1] == 0x67 and header[2] == 0x67 and header[3] == 0x53:
@@ -169,10 +171,10 @@ static func _load_external_sound(path: String) -> AudioStream:
 		is_mp3 = header[0] == 0xff and (header[1] & 0xe0) == 0xe0
 	if is_mp3:
 		if path.get_extension().to_lower() != "mp3":
-			_warn_once("%s zawiera MP3 mimo rozszerzenia .ogg; najlepiej zmień nazwę na .mp3." % path)
+			_warn_once(STORY_TEXT.text("%s zawiera MP3 mimo rozszerzenia .ogg; najlepiej zmień nazwę na .mp3.") % path)
 		file.seek(0)
 		return AudioStreamMP3.load_from_buffer(file.get_buffer(file.get_length()))
-	_warn_once("Nieobsługiwany lub uszkodzony plik audio: %s" % path)
+	_warn_once(STORY_TEXT.text("Nieobsługiwany lub uszkodzony plik audio: %s") % path)
 	return null
 
 static func _load_model_path(path: String) -> Node3D:
@@ -213,14 +215,14 @@ static func _scan_mod_root(root_path: String, models: Array, sound_packs: Array,
 		var sounds_path := _find_named_directory(mod_path, "sounds")
 		var pack_id := "mod:%s" % mod_id
 		if not sounds_path.is_empty() and not seen_packs.has(pack_id) and _directory_has_extension(sounds_path, ["ogg", "mp3"]):
-			sound_packs.append({"id": pack_id, "label": "%s — paczka moda" % mod_name, "path": sounds_path, "mod": mod_name})
+			sound_packs.append({"id": pack_id, "label": STORY_TEXT.text("%s — paczka moda") % mod_name, "path": sounds_path, "mod": mod_name})
 			seen_packs[pack_id] = true
 		var models_path := _find_named_directory(mod_path, "models")
 		if not models_path.is_empty():
 			_scan_asset_models(models_path, "mod:%s" % mod_id, mod_name, models, seen_models)
 	for archive_name in root.get_files():
 		if archive_name.get_extension().to_lower() == "zip":
-			_warn_once("Archiwum %s trzeba najpierw rozpakować." % root_path.path_join(archive_name))
+			_warn_once(STORY_TEXT.text("Archiwum %s trzeba najpierw rozpakować.") % root_path.path_join(archive_name))
 
 static func _scan_asset_models(path: String, id_prefix: String, mod_name: String, models: Array, seen_models: Dictionary) -> void:
 	_scan_model_directory(path, path, id_prefix, mod_name, models, seen_models)
@@ -265,17 +267,17 @@ static func _find_named_directory(parent_path: String, wanted_name: String) -> S
 	for child_name in directory.get_directories():
 		if child_name.strip_edges().to_lower() == wanted_name:
 			if child_name != wanted_name:
-				_warn_once("Folder '%s' ma zbędne spacje; oczekiwano '%s'." % [child_name, wanted_name])
+				_warn_once(STORY_TEXT.text("Folder '%s' ma zbędne spacje; oczekiwano '%s'.") % [child_name, wanted_name])
 			return parent_path.path_join(child_name)
 	return ""
 
 static func _validate_manifest(metadata: Dictionary, mod_name: String) -> void:
 	if metadata.is_empty():
-		_warn_once("Mod '%s' nie ma pliku mod.json z informacją o licencji." % mod_name)
+		_warn_once(STORY_TEXT.text("Mod '%s' nie ma pliku mod.json z informacją o licencji.") % mod_name)
 		return
 	for field in ["author", "license", "source_url"]:
 		if str(metadata.get(field, "")).strip_edges().is_empty():
-			_warn_once("Mod '%s': uzupełnij pole '%s' przed publikacją." % [mod_name, field])
+			_warn_once(STORY_TEXT.text("Mod '%s': uzupełnij pole '%s' przed publikacją.") % [mod_name, field])
 
 static func _warn_once(message: String) -> void:
 	if message not in last_warnings:

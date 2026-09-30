@@ -118,6 +118,8 @@ func _run() -> void:
 		quit(1)
 		return
 	game.active_dialogue.call("finish_dialogue")
+	game.active_dialogue._select_choice(game.active_dialogue._current_lines[1].choices[0])
+	game.active_dialogue.call("finish_dialogue")
 	await process_frame
 	if not game.campaign_active or game.target_score != 1500 or game.bot_avatar_id != "builtin:innkeeper":
 		printerr("FAIL: pierwszy rozdział kampanii nie skonfigurował fabularnego przeciwnika")
@@ -132,7 +134,7 @@ func _run() -> void:
 	game.match_learning = {"bank_count": 1, "bank_total": 1500, "continue_count": 1, "continue_total": 500}
 	game._show_winner(true)
 	game._show_winner(true)
-	if game.campaign_progress != 1 or game.campaign_economy.silver != 210:
+	if game.campaign_progress != 1 or game.campaign_economy.silver != 215:
 		printerr("FAIL: zwycięstwo nie odblokowało kolejnego rozdziału kampanii")
 		quit(1)
 		return
@@ -151,7 +153,7 @@ func _run() -> void:
 		return
 	game._begin_campaign_match(0)
 	game._show_winner(false)
-	if game.campaign_economy.silver != 210:
+	if game.campaign_economy.silver != 215:
 		printerr("FAIL: porażka zmieniła saldo srebra")
 		quit(1)
 		return
@@ -162,7 +164,7 @@ func _run() -> void:
 	game._begin_campaign_match(0)
 	game.player_score = game.target_score
 	game._show_winner(true)
-	if game.campaign_economy.silver != 260 or game.campaign_progress != 1:
+	if game.campaign_economy.silver != 265 or game.campaign_progress != 1:
 		printerr("FAIL: ponowne zwycięstwo nie przyznało mniejszej nagrody")
 		quit(1)
 		return
@@ -173,12 +175,12 @@ func _run() -> void:
 	game.start_game()
 	game.player_score = game.target_score
 	game._show_winner(true)
-	if game.campaign_economy.silver != 260:
+	if game.campaign_economy.silver != 265:
 		printerr("FAIL: szybki pojedynek przyznał srebro kampanii")
 		quit(1)
 		return
 	game._load_progress()
-	if game.campaign_economy.silver != 260 or game.campaign_economy.loadout != [1, 1, 3, 1, 1, 1]:
+	if game.campaign_economy.silver != 265 or game.campaign_economy.loadout != [1, 1, 3, 1, 1, 1]:
 		printerr("FAIL: wczytanie postępu nie przywróciło ekonomii kampanii")
 		quit(1)
 		return

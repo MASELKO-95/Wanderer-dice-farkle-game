@@ -25,7 +25,24 @@ const MILESTONES := [
 
 # Optional wagers, configured separately for each opponent (zero-based chapter).
 # Opponents absent from this table do not accept wagers.
-const WAGER_LIMITS := { 1: 100, 4: 200, 8: 500}
+const WAGER_LIMITS := {1: 100, 4: 200, 8: 500, 12: 20, 13: 150}
+
+
+# Stable indices 0–11 keep old saves intact. Insertions have separate IDs.
+const ROUTE := [0, 12, 1, 13, 2, 3, 4, 5, 6, 7, 8, 9, 10, 14, 11]
+const INSERTIONS := {
+	12: {"number": "1B", "name": "Gromek, karczmarz", "avatar": "builtin:innkeeper", "profile": "rookie", "difficulty": "normal", "theme": "tavern", "target": 1800},
+	13: {"number": "2B", "name": "Vespera, Córka Cienia", "avatar": "builtin:witch", "profile": "gambler", "difficulty": "hard", "theme": "forest", "target": 2400},
+	14: {"number": "11B", "name": "Matylda, twoja matka", "avatar": "builtin:witch", "profile": "tactician", "difficulty": "hard", "theme": "tavern", "target": 3000}
+}
+const SIDE_TABLES := [
+	{"name": "Ada, piekarka", "target": 1000, "reward": 30, "requires": [], "intro": "Przy bocznym stole Ada otrzepuje fartuch z mąki. «Chleb rośnie sam. W tym czasie zdążymy zagrać.»", "victory": "«Dobra ręka. Weź srebro, a bułkę dorzucę od siebie.»"},
+	{"name": "Witek, stajenny", "target": 1200, "reward": 40, "requires": [0], "intro": "Witek kończy poić konie. «Zwierzęta odpoczywają. Teraz moja kolej — stół czeka.»", "victory": "«Kości posłuchały cię lepiej niż mój siwek. Srebro twoje.»"},
+	{"name": "Hanka, tkaczka", "target": 1200, "reward": 40, "requires": [0], "intro": "Hanka odkłada wrzeciono i rozkłada kości na skrawku płótna. «Tu nic się nie plącze. Najwyżej szczęście.»", "victory": "«Ładny splot. Ani jednego węzła, którego nie dało się rozwiązać.»"},
+	{"name": "Olek, bednarz", "target": 1400, "reward": 50, "requires": [1], "intro": "Olek odwraca pustą beczkę. «Stół pierwsza klasa. Jak przegram, przynajmniej nic nie wycieknie.»", "victory": "«Solidna robota. Gdybym tak składał beczki, miałbym kolejkę pod warsztatem.»"},
+	{"name": "Zosia, zielarka", "target": 1400, "reward": 50, "requires": [2], "intro": "Zosia stawia kubek mięty obok kości. «Na nerwy pomaga. Na brak szczęścia — już mniej.»", "victory": "«Srebro na drogę. A miętę wypij, zanim wystygnie.»"},
+	{"name": "Feliks, stary woźnica", "target": 1600, "reward": 70, "requires": [3, 4], "intro": "Przy wyjściu z areny Feliks poprawia kapelusz. «Cały dziedziniec już z tobą grał. Zostałem ja. Siadaj, nim ruszą wozy.»", "victory": "«Sześć stołów za tobą. Teraz masz i na drogę, i o czym opowiadać.»"}
+]
 
 
 static func wager_limit(index: int) -> int:
@@ -33,6 +50,12 @@ static func wager_limit(index: int) -> int:
 
 
 static func chapter(index: int) -> Dictionary:
+	if INSERTIONS.has(index):
+		return INSERTIONS[index].duplicate(true)
+	if index >= 100 and index < 100 + SIDE_TABLES.size():
+		var result: Dictionary = SIDE_TABLES[index - 100].duplicate(true)
+		result.merge({"avatar": "builtin:innkeeper", "profile": "rookie", "difficulty": "easy" if index < 103 else "normal", "theme": "tavern"})
+		return result
 	if index < 0 or index >= CHAPTERS.size():
 		return {}
 	return (CHAPTERS[index] as Dictionary).duplicate(true)

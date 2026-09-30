@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 set -eu
 
-version=${1:-0.8.0-alpha}
+version=${1:-0.9.0}
 godot_bin=${GODOT_BIN:-godot}
 output_root="build/gamejolt/$version"
 linux_dir="$output_root/linux"

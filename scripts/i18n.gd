@@ -1,5 +1,7 @@
 extends Node
 
+const STORY_TEXT := preload("res://scripts/story_text.gd")
+
 signal language_changed
 
 var current_locale: String = "pl"
@@ -36,11 +38,12 @@ func _migrate_previous_game_saves() -> void:
 
 func set_language(locale: String) -> void:
 	current_locale = locale
+	STORY_TEXT.locale = "pl" if locale == "pl" else "en"
 	_save_setting("locale", locale)
 	language_changed.emit()
 
 func translate(key: String, args: Array = []) -> String:
-	var text: String = _lookup(key, current_locale)
+	var text: String = _lookup(key, "pl" if current_locale == "pl" else "en")
 	if text.is_empty():
 		for fb: String in _fallback_chain:
 			text = _lookup(key, fb)
@@ -133,7 +136,7 @@ func get_language_name(locale: String) -> String:
 		"ja": "🇯🇵 日本語", 
 		"zh": "🇨🇳 中文"
 	}
-	return str(names.get(locale, locale))
+	return str(names.get(locale, locale)) + (" (English)" if locale not in ["pl", "en"] else "")
 
 func _save_setting(key: String, value: Variant) -> void:
 	var cfg := ConfigFile.new()

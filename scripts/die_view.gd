@@ -9,6 +9,7 @@ var selected := false
 var locked := false
 var style_id := 0
 var hovered := false
+var keyboard_cursor := false
 
 const PALETTES := [
 	{"face": Color("#777064"), "edge": Color("#403b34"), "pip": Color("#251f1a"), "shine": Color("#999184")},
@@ -71,6 +72,8 @@ func _on_gui_input(event: InputEvent) -> void:
 
 
 func _draw() -> void:
+	if keyboard_cursor and not locked:
+		draw_rect(Rect2(1, 1, size.x - 2, size.y - 2), Color("#90dfff"), false, 2.0)
 	var palette: Dictionary = PALETTES[clampi(style_id, 0, PALETTES.size() - 1)]
 	var lift := 5.0 if selected else (2.0 if hovered else 0.0)
 	var rect := Rect2(5, 7 - lift, size.x - 10, size.y - 13)

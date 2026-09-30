@@ -1,0 +1,107 @@
+extends SceneTree
+
+const RULES := preload("res://scripts/campaign_chronicles.gd")
+const CATALOG := preload("res://scripts/campaign_catalog.gd")
+const AWARDS := preload("res://scripts/campaign_achievements.gd")
+
+func _init() -> void:
+	var state := {}
+	RULES.initialize(state,0)
+	assert(RULES.next_encounter(0,state) == 0)
+	assert(RULES.clean_run(state))
+	assert(not RULES.can_enter(100,0,state))
+	assert(RULES.record_result(state,0,false).advance)
+	assert(state.ending_points == {"princess":1,"king":0,"emperor":-1,"world_champion":-2})
+	assert(not RULES.can_enter(1,1,state))
+	assert(RULES.can_enter(100,1,state))
+	assert(not RULES.can_enter(105,1,state))
+	var purse := 0
+	for index in range(100,106):
+		assert(RULES.next_encounter(1,state) == index)
+		RULES.record_result(state,index,false)
+		assert(RULES.next_encounter(1,state) == index, "A lost side match must be retried")
+		assert(RULES.can_enter(index,1,state))
+		var before: Dictionary = state.ending_points.duplicate()
+		purse += int(RULES.record_result(state,index,true).reward)
+		assert(state.ending_points == before)
+		assert(RULES.record_result(state,index,true).reward == 0)
+	assert(purse == 280 and RULES.can_enter(12,1,state))
+	assert(RULES.next_encounter(1,state) == 12)
+	assert(RULES.record_result(state,12,false).advance)
+	assert(RULES.next_encounter(1,state) == 1)
+	assert(RULES.can_enter(1,1,state))
+	assert(not RULES.record_result(state,1,false).advance)
+	assert(state.przegral_z_cieniem)
+	assert(RULES.record_result(state,1,true).reward == 175)
+	assert(state.pieczec and state.pomogl_zlodziejowi)
+	assert(RULES.next_encounter(2,state) == 13)
+	assert(RULES.can_enter(13,2,state) and not RULES.can_enter(2,2,state))
+	var alliance := RULES.option(state,13,"intro","sojusz")
+	RULES.apply_choice(state,13,"intro",alliance)
+	assert(state.sojusz_vespera)
+	assert(not RULES.record_result(state,13,false).advance and state.sojusz_vespera)
+	RULES.record_result(state,13,true)
+	assert(RULES.next_encounter(2,state) == 2)
+	assert(RULES.can_enter(2,2,state))
+	assert("shadow" in RULES.endings(state))
+	assert(not RULES.record_result(state,3,false).advance)
+	assert(RULES.record_result(state,3,false).advance and state.sekret)
+	assert(not RULES.record_result(state,14,false).advance)
+	assert(RULES.next_encounter(11,state) == 14)
+	assert(RULES.record_result(state,14,false).advance)
+	assert(RULES.next_encounter(11,state) == 11)
+	assert(RULES.next_encounter(12,state) == -1)
+	assert(RULES.next_encounter(8,{"finished":true}) == -1)
+	assert(not state.get("matka_pogodzona",false))
+	RULES.record_result(state,14,true)
+	assert(state.matka_pogodzona)
+	var before: Dictionary = state.ending_points.duplicate()
+	RULES.record_wager(state,0)
+	assert(state.ending_points == before and state.liczba_zakladow == 0)
+	RULES.record_wager(state,20)
+	assert(state.ending_points.king == before.king - 2 and state.liczba_zakladow == 1)
+	assert(not RULES.clean_run(state))
+	var low := {}
+	RULES.initialize(low,0)
+	low.ending_points = {"princess":-5,"king":-2,"emperor":-3,"world_champion":-4}
+	assert(RULES.endings(low) == ["king"])
+	low.ending_points = {"princess":8,"king":9,"emperor":8,"world_champion":8}
+	assert(RULES.endings(low).size() == 4)
+	assert("king" in RULES.endings(low,"king"))
+	assert("emperor" in RULES.endings(low,"emperor"))
+	assert("shadow" not in RULES.endings(low))
+	low.sojusz_vespera = true
+	assert("shadow" not in RULES.endings(low), "Secret ending requires both flags")
+	low.pomogl_zlodziejowi = true
+	assert("shadow" in RULES.endings(low))
+	assert("shadow" not in RULES.endings(low,"king"), "Secret ending is only available after Aurelius")
+	assert(RULES.bard_song({"elara":"wygoda","lucjan":"king"}).contains("podpisywać"), "Bard must honor the chosen song")
+	assert(RULES.bard_song({"elara":"wygoda"}).contains("doglądać ognia"))
+	assert(RULES.bard_song({"elara":"wygoda","lucjan":"king","piesn_cienia":true}).contains("Vespera"))
+	low.console_used = true
+	assert(not RULES.clean_run(low))
+	var legacy := {}
+	RULES.initialize(legacy,12,true)
+	assert(RULES.passed(legacy,13) and RULES.passed(legacy,14) and not RULES.clean_run(legacy))
+	for index in CATALOG.ROUTE:
+		assert(not RULES.data(index).is_empty())
+		for section in ["intro","victory","defeat"]:
+			var sequence := RULES.build(index,section,state)
+			assert(not sequence.lines.is_empty())
+			for line in sequence.lines:
+				assert(line.next_line_index < sequence.lines.size())
+				for choice in line.choices:
+					assert(choice.next_line_index >= 0 and choice.next_line_index < sequence.lines.size())
+	for ending in ["princess","king","emperor","world_champion","shadow"]:
+		assert(RULES.epilogue(ending,state).lines.size() >= 2)
+	var clean := {}
+	RULES.initialize(clean,0)
+	var awards := AWARDS.new()
+	assert("clean_run" not in awards.evaluate(clean,""))
+	assert("clean_run" in awards.evaluate(clean,"king"))
+	assert(awards.evaluate(clean,"king").is_empty())
+	var restored := AWARDS.new()
+	restored.read_save()
+	assert(restored.unlocked.has("clean_run"))
+	print("PASS: all chapters, six-table tree, flags, mercy, endings, wagers, clean achievement and legacy migration")
+	quit()

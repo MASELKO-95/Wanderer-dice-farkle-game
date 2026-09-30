@@ -1,0 +1,1372 @@
+{
+  "0": {
+    "name": "Tomek Brzuch",
+    "narrator": "Arena huczy od rozmów. Z biletem od staruszka podchodzisz do zapisów. Iskra pamięta twarze.",
+    "speech": "Dzień dobry, w czym mogę pomóc?",
+    "choices": [
+      {
+        "id": "register",
+        "text": "Chcę zapisać się na turniej.",
+        "reply": "Stanowisko trzecie, rozpiska przeciwników, i proszę nie pluć na kości. Sędziowie mają alergię.",
+        "points": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "flags": {
+          "zapisy": "register"
+        }
+      },
+      {
+        "id": "flirt",
+        "text": "Hej, skarbie. Może umówimy się na randkę?",
+        "reply": "Umówimy. Ty — na stolik. Ja — na przerwę. Twoje szczęście, że pióro mam ostrzejsze niż język, inaczej [dopisałabym|dopisałbym] ci «frajer» przy nazwisku.",
+        "points": [
+          -1,
+          1,
+          1,
+          1
+        ],
+        "flags": {
+          "zapisy": "flirt"
+        }
+      },
+      {
+        "id": "leniuch",
+        "text": "Gdzie tu można usiąść i nic nie robić, zanim zaczną?",
+        "reply": "Ławka w cieniu. Nie zasłaniaj tablicy. I nie chrap.",
+        "points": [
+          2,
+          -1,
+          0,
+          -1
+        ],
+        "flags": {
+          "zapisy": "leniuch"
+        }
+      }
+    ],
+    "victory": "Jesteś [lepszy|lepsza]. Na, pięć srebra. Idź dalej, zanim ci zazdrosne ciastko zjem.",
+    "defeat": "Spodziewałem się więcej, ale kości dziś wiały w moją stronę. Możesz wygrać ten turniej. Tylko nie dzisiaj, przy mnie.",
+    "win_points": [
+      1,
+      1,
+      1,
+      1
+    ],
+    "loss_points": [
+      1,
+      0,
+      -1,
+      -2
+    ],
+    "reward": 155,
+    "win_flags": {},
+    "post": [],
+    "choice_speaker": "Iskra — [ekspedientka|ekspedient]",
+    "before": "Hej! Ale z ciebie drobnota. Grajmy, zanim szczęście mi ucieknie!"
+  },
+  "12": {
+    "name": "Gromek, karczmarz",
+    "narrator": "Trakt pachnie dymem i cebulą. Gospoda „Pod Trzema Kośćmi” ma klamkę wytartą od rąk tych, co przegrali i tych, co wygrali — tych samych, tylko w inną stronę.",
+    "speech": "Siadaj, zanim ci nogi powiedzą «dość». Pierwsza miska od domu. Druga — jak zagrasz. Albo jak pomożesz przy kotle, jak ci się kości nie śpieszą.",
+    "choices": [
+      {
+        "id": "sen",
+        "text": "Zjem i przysnę. Kotły nie są moją wojną.",
+        "reply": "Szczerość syta. Śpij. Potem i tak cię wyciągnę do stołu, bo u mnie nikt nie wychodzi tylko z brzuchem.",
+        "points": [
+          2,
+          -1,
+          0,
+          -1
+        ],
+        "flags": {
+          "gromek": "sen"
+        }
+      },
+      {
+        "id": "praca",
+        "text": "Pomogę przy kotle. Potem zagram uczciwie.",
+        "reply": "Dobre ręce. Cebula nie kłamie. Lubię takich.",
+        "points": [
+          0,
+          2,
+          -1,
+          0
+        ],
+        "flags": {
+          "gromek": "praca"
+        },
+        "silver": 10
+      },
+      {
+        "id": "kradziez",
+        "text": "Gulasz zjem, a z kasy… no, kto policzy w takim dymie?",
+        "reply": "Ja policzę. Ręką, której nie widać nad kotłem. Zagrasz o to, czy mam cię wyprosić łyżką.",
+        "points": [
+          -1,
+          -2,
+          2,
+          0
+        ],
+        "flags": {
+          "gromek": "kradziez",
+          "brudne_rece": true
+        }
+      },
+      {
+        "id": "gra",
+        "text": "Nie chcę kotła. Chcę stół i kości. Teraz.",
+        "reply": "Ah. Typ, co je później. Szanuję. Kości mam ciepłe, leżały przy piecu.",
+        "points": [
+          0,
+          0,
+          0,
+          2
+        ],
+        "flags": {
+          "gromek": "gra"
+        }
+      }
+    ],
+    "victory": "Zabieraj srebro i gulasz na drogę. I pamiętaj: korona nie smakuje lepiej niż cebula, tylko głośniej dzwoni.",
+    "defeat": "Zostań na sianie. Jutro kości będą mniej złośliwe, a ja mniej śpiewny. Przegrana przy gulaszu nie hańbi.",
+    "win_points": [
+      1,
+      1,
+      0,
+      1
+    ],
+    "loss_points": [
+      1,
+      0,
+      0,
+      -1
+    ],
+    "reward": 80,
+    "win_flags": {
+      "gulasz": true
+    },
+    "post": [],
+    "before": "U mnie nie wygrywa się królestwa. U mnie wygrywa się spokojną noc. To już coś."
+  },
+  "1": {
+    "name": "Cień, Król Złodziei",
+    "narrator": "Leśna gospoda. W dymie ktoś tasuje nie karty, tylko czyjeś kieszenie. Na stole leży twoja pieczęć turniejowa. Obok — człowiek, którego twarz jest tylko jednym okiem i uśmiechem.",
+    "speech": "Co tam, [smarkaczu|smarkulo]? Szukasz błyskotki? Leżała w kurzu, to ją podniosłem. W tym lesie wszystko, co nie jest przywiązane, należy do mnie. Chyba że umiesz grać.",
+    "choices": [
+      {
+        "id": "prawda",
+        "text": "Powiedz prawdę o pieczęci. Potrzebuję jej na dwór.",
+        "reply": "Prawda jest krótka: straż spała, pieczęć nie. Wziąłem. Oddam, jak wygrasz. Albo jak mnie rozśmieszysz ceną.",
+        "points": [
+          1,
+          1,
+          1,
+          0
+        ],
+        "flags": {
+          "cien_rozmowa": "prawda"
+        }
+      },
+      {
+        "id": "targ",
+        "text": "Hej, ile chciałbyś za tę pieczęć?",
+        "reply": "Pięćset srebra. Dla króla złodziei to napiwek. Dla ciebie — noga od stołu.",
+        "points": [
+          1,
+          1,
+          1,
+          0
+        ],
+        "flags": {
+          "cien_rozmowa": "targ"
+        }
+      },
+      {
+        "id": "wyzwanie",
+        "text": "Stawaj do gry, złodzieju.",
+        "reply": "Wreszcie ktoś mówi ludzkim językiem.",
+        "points": [
+          1,
+          0,
+          0,
+          1
+        ],
+        "flags": {
+          "cien_rozmowa": "wyzwanie"
+        }
+      },
+      {
+        "id": "pomoc",
+        "text": "Zatrzymaj pieczęć. Wskaż mi inną drogę na dwór i będziemy kwita. Nie doniosę.",
+        "reply": "Innej drogi nie ma. Jest tylko ta i ci, co myślą, że jest inna. Ale «nie doniosę» — to już coś. Zagraj. Jak wygrasz, pieczęć i mój ukłon. Jak przegrasz… i tak cię nie sprzedam straży. Mam zasady.",
+        "points": [
+          1,
+          0,
+          1,
+          0
+        ],
+        "flags": {
+          "pomogl_zlodziejowi": true
+        }
+      }
+    ],
+    "victory": "Trzymaj swoją pieczęć. Ha, tfu. Graj dalej, [smarkaczu|smarkulo]. Jak cię na dworze zgniotą, wróć. Złodzieje nie pytają o tytuł.",
+    "defeat": "Frajer. Pieczęć zostaje. Droga na dwór — też. Wracaj, aż ci się kości odkleją od dumy. Bez niej bramy się nie otworzą.",
+    "win_points": [
+      1,
+      1,
+      1,
+      2
+    ],
+    "loss_points": [
+      0,
+      0,
+      0,
+      -2
+    ],
+    "reward": 175,
+    "win_flags": {
+      "pieczec": true,
+      "pomogl_zlodziejowi": true
+    },
+    "post": []
+  },
+  "13": {
+    "name": "Vespera, Córka Cienia",
+    "narrator": "Za gospodą, w alei gdzie księżyc kradnie sam sobie światło, czeka kobieta w złotym kolczyku. Ma oczy Cienia i uśmiech, którego on już nie pamięta.",
+    "speech": "Ojciec mówi, że umiesz przegrywać albo płacić. Ja pytam o trzecią rzecz: czy umiesz zniknąć. Dwór zje cię z koroną włącznie. My zjadamy dwór od piwnicy.",
+    "choices": [
+      {
+        "id": "prawo",
+        "text": "Nie wchodzę w złodziejskie korony. Idę po uczciwą.",
+        "reply": "Uczciwa korona waży więcej. Powodzenia. I tak zagrasz, bo chcę wiedzieć, czy ojciec nie zmiękł na twoim punkcie.",
+        "points": [
+          0,
+          2,
+          -1,
+          0
+        ],
+        "flags": {
+          "sojusz_vespera": false
+        }
+      },
+      {
+        "id": "sojusz",
+        "text": "Zniknąć umiem. Sojusz — tak. Korony zostawiam im.",
+        "reply": "Dobrze. Jak dojdziesz na szczyt i ci się znudzi słońce, gwizdnij. Cienie nie śpią.",
+        "points": [
+          1,
+          -1,
+          1,
+          0
+        ],
+        "flags": {
+          "sojusz_vespera": true,
+          "pomogl_zlodziejowi": true
+        }
+      },
+      {
+        "id": "apetyt",
+        "text": "Chcę i dwór, i piwnicę. Cel uświęca oba.",
+        "reply": "To już cesarski apetyt. Lubię apetyt. Uważaj, żebyś nie [ugryzł|ugryzła] własnego języka.",
+        "points": [
+          -1,
+          -1,
+          2,
+          0
+        ],
+        "flags": {
+          "sojusz_vespera": true,
+          "brudne_rece": true
+        }
+      },
+      {
+        "id": "stol",
+        "text": "Nie obchodzi mnie twój dwór ani piwnica. Obchodzi mnie stół.",
+        "reply": "Wreszcie ktoś szczery jak kość. Graj. Resztę sobie dośpiewam.",
+        "points": [
+          0,
+          0,
+          0,
+          2
+        ],
+        "flags": {
+          "sojusz_vespera": false
+        }
+      }
+    ],
+    "victory": "Ojciec nie kłamał. Masz rękę. Pamiętaj aleję. Nie każdy mistrz chce, żeby o nim śpiewano.",
+    "defeat": "Aleja poczeka. Dwór nie. Wracaj, jak ci kości odrosną.",
+    "win_points": [
+      1,
+      0,
+      1,
+      1
+    ],
+    "loss_points": [
+      0,
+      0,
+      0,
+      -1
+    ],
+    "reward": 120,
+    "win_flags": {},
+    "post": [
+      {
+        "id": "wroce",
+        "text": "Jak skończę z koronami, wrócę.",
+        "reply": "Aleja będzie czekać.",
+        "points": [
+          1,
+          0,
+          1,
+          0
+        ],
+        "flags": {
+          "sojusz_vespera": true
+        }
+      },
+      {
+        "id": "gra",
+        "text": "Nie wrócę. To była tylko gra.",
+        "reply": "Niech więc kości prowadzą cię dalej.",
+        "points": [
+          0,
+          1,
+          0,
+          1
+        ],
+        "flags": {}
+      }
+    ]
+  },
+  "2": {
+    "name": "Sir Roderick",
+    "narrator": "Brama dworu. Hełmy jak rząd zamkniętych kubków. Na środku stoi rycerz, który wygląda, jakby regulamin zjadł na śniadanie i nie popił.",
+    "speech": "Pieczęć. Dobrze. Dalej nie wejdziesz na słowo, tylko na kości. Tu się nie kradnie kolejek, nie kupuje sędziów i nie pluje na stół. Nazywam się Roderick. Służę prawu. Aldryk jest królem. To dwie różne rzeczy, ale dziś musisz przejść przez obie.",
+    "choices": [
+      {
+        "id": "uczciwie",
+        "text": "Gram uczciwie. Bez sztuczek, bez pośpiechu.",
+        "reply": "To jedyna odpowiedź, której nie muszę sprawdzać dwa razy. Zaczynajmy.",
+        "points": [
+          1,
+          2,
+          -1,
+          0
+        ],
+        "flags": {}
+      },
+      {
+        "id": "prawo",
+        "text": "Prawo, król, ja — kto pierwszy padnie, ten winny.",
+        "reply": "Mówisz jak ktoś, kto chce później pisać prawa. Uważaj, żebyś ich nie [pisał|pisała] krwią.",
+        "points": [
+          0,
+          0,
+          2,
+          0
+        ],
+        "flags": {
+          "brudne_rece": true
+        }
+      },
+      {
+        "id": "stol",
+        "text": "Im szybciej skończymy, tym szybciej wrócę do stołu, nie do gadania.",
+        "reply": "Stół jest święty. Gadanie — mniej. Graj.",
+        "points": [
+          0,
+          0,
+          0,
+          2
+        ],
+        "flags": {}
+      },
+      {
+        "id": "cien",
+        "text": "Możemy usiąść w cieniu i zagrać bez publiczności? Słońce mnie męczy.",
+        "reply": "Cień bramy. Publiczność i tak usłyszy kości. Ale żądanie wygody nie jest zbrodnią.",
+        "points": [
+          2,
+          0,
+          0,
+          -1
+        ],
+        "flags": {}
+      }
+    ],
+    "victory": "Czysta gra. Wejście twoje. Jeśli zostaniesz kimś, pamiętaj tę bramę. Korona, która tu kłamie, nie jest nic warta.",
+    "defeat": "Prawo nie otwiera się dla przegranych. Wracaj, gdy kości będą równe twoim słowom.",
+    "win_points": [
+      1,
+      2,
+      0,
+      1
+    ],
+    "loss_points": [
+      0,
+      1,
+      0,
+      -1
+    ],
+    "reward": 200,
+    "win_flags": {
+      "dwor": true
+    },
+    "post": []
+  },
+  "3": {
+    "name": "Morgana z Boru",
+    "narrator": "Las nie pyta o pieczęcie. Chata Morgany pachnie suszoną macierzanką i starym dębem. Na stole kości z kości — naprawdę z kości, ale nie wiadomo czyich, i lepiej nie pytać.",
+    "speech": "[Przyszedłeś|Przyszłaś] po księżniczkę, a mówisz o turnieju. Aldryk zamknął ją, bo wróżba: kośćmi urodzony bez tytułu zabierze mu koronę i córkę. Ja tę wróżbę szeptałam jego żonie, nie jemu. Dlatego on mnie nienawidzi, a ja wciąż żyję. Sekret oddam lepszemu graczowi. Po co ci on — to już twoja sprawa.",
+    "choices": [
+      {
+        "id": "ratunek",
+        "text": "Chcę ją wyciągnąć, bo nikt nie zasługuje na wieżę. Reszta mnie mniej obchodzi.",
+        "reply": "Rzadkie. Las lubi rzadkie rzeczy. Graj.",
+        "points": [
+          2,
+          1,
+          -1,
+          0
+        ],
+        "flags": {
+          "morgana": "ratunek"
+        }
+      },
+      {
+        "id": "prawo",
+        "text": "Chcę wiedzieć, bo król, który więzi dziecko, nie powinien rządzić. Zrobię to według prawa stołu.",
+        "reply": "Prawo stołu jest starsze niż jego korona. Dobrze.",
+        "points": [
+          0,
+          2,
+          0,
+          0
+        ],
+        "flags": {
+          "morgana": "prawo"
+        }
+      },
+      {
+        "id": "ambicja",
+        "text": "Chcę sekret, bo chcę jego miejsce. Wróżba niech się spełni.",
+        "reply": "Spełni się i tak. Pytanie, czy zostaniesz po niej człowiekiem.",
+        "points": [
+          -1,
+          -1,
+          2,
+          0
+        ],
+        "flags": {
+          "morgana": "ambicja",
+          "brudne_rece": true
+        }
+      },
+      {
+        "id": "kosci",
+        "text": "Sekret, wieża, wróżba — gadanie. Kości. Potem zobaczymy.",
+        "reply": "Aureliusz też tak zaczął. Uważaj na puste oczy.",
+        "points": [
+          0,
+          0,
+          0,
+          2
+        ],
+        "flags": {
+          "morgana": "kosci"
+        }
+      }
+    ],
+    "victory": "Słuchaj raz: Elara siedzi w zachodniej wieży. Klucz ma błazen, bo Aldryk uznał, że hańba jest śmieszna. Błazen jest smutniejszy niż hańba. I jeszcze: gdy ją wyciągniesz, zapytaj, czy chce korony. Nikt jej nie pyta.",
+    "defeat": "Las nie oddaje sekretów przegranym. Wróć. Wróżba poczeka. Dziewczyna — mniej.",
+    "win_points": [
+      2,
+      1,
+      0,
+      1
+    ],
+    "loss_points": [
+      1,
+      0,
+      0,
+      -1
+    ],
+    "reward": 225,
+    "win_flags": {
+      "sekret": true,
+      "wieza": "zachodnia",
+      "klucz": "blazen"
+    },
+    "post": []
+  },
+  "4": {
+    "name": "Błazen Bez Korony",
+    "narrator": "Karczma pod murem wieży. Na belce wisi klucz jak medal za klęskę. Pod nim ktoś w wytartym kaftanie kręci kością na nosie i nie spada.",
+    "speech": "Witaj, przyszły ratunku, przyszła korono, przyszłe nic. Klucz mam na szyi, bo król lubi żarty, których nie rozumie. Oddam go po najbardziej szalonym pojedynku w królestwie. Szalony znaczy: bez miny sędziego. Kości spadną, gdzie chcą.",
+    "choices": [
+      {
+        "id": "klucz",
+        "text": "Oddaj klucz, wyciągnę ją, a ty możesz przestać nosić hańbę.",
+        "reply": "Hańba mi pasuje. Jak dobrze skrojony kaftan. Ale gest lubię. Graj.",
+        "points": [
+          2,
+          1,
+          0,
+          0
+        ],
+        "flags": {}
+      },
+      {
+        "id": "pospiech",
+        "text": "Klucz, wieża, korona. Nie mam czasu na błaznów.",
+        "reply": "Wszyscy, co nie mają czasu na błaznów, kończą jako żart w mojej piosence. Graj, [pośpieszny|pośpieszna].",
+        "points": [
+          -1,
+          0,
+          2,
+          0
+        ],
+        "flags": {}
+      },
+      {
+        "id": "gra",
+        "text": "Szalony pojedynek brzmi jak jedyny powód, dla którego tu jestem.",
+        "reply": "Ty. Ja. Kości. Reszta świata niech się udławi koroną.",
+        "points": [
+          0,
+          0,
+          0,
+          2
+        ],
+        "flags": {}
+      },
+      {
+        "id": "miod",
+        "text": "Jak wygram, klucz. Jak przegram, zostanę tu na miód pitny i sen.",
+        "reply": "Najuczciwsza oferta dnia. Prawie cię lubię.",
+        "points": [
+          2,
+          -1,
+          0,
+          0
+        ],
+        "flags": {}
+      }
+    ],
+    "victory": "Łap. Klucz cieplejszy od korony. Powiedz Elarze, że błazen kłania się tym, co nie śmieją się z zamkniętych drzwi. I… jeśli kiedyś znudzisz się tronem, mam wolny stołek.",
+    "defeat": "Klucz zostaje. Miód też. Wracaj. Wieża nie ucieknie. Niestety.",
+    "win_points": [
+      1,
+      1,
+      0,
+      1
+    ],
+    "loss_points": [
+      1,
+      0,
+      0,
+      -1
+    ],
+    "reward": 250,
+    "win_flags": {
+      "klucz": true
+    },
+    "post": []
+  },
+  "5": {
+    "name": "Król Aldryk",
+    "narrator": "Zachodnia wieża. Dywan, który pamięta kroki tylko w jedną stronę. Aldryk siedzi przy stole jak ktoś, kto przegrał sen i wygrał armię.",
+    "speech": "Wróżba. Kośćmi urodzony. Bez tytułu. Zabierzesz mi koronę i córkę. Zamknąłem ją, żeby wróżba się udławiła. Widzę, że się nie udławiła. Gram. Nie o jej rękę — o to, czy wróżba ma prawo wejść do mojego domu.",
+    "choices": [
+      {
+        "id": "litosc",
+        "text": "Nie [przyszedłem|przyszłam] kraść córki. [Przyszedłem|Przyszłam] otworzyć drzwi. Korony możesz dotrzymać, jak uczciwie zagrasz.",
+        "reply": "Mówisz jak ktoś, kto nie czytał wróżby do końca. Albo jak ktoś lepszy niż ja. Graj.",
+        "points": [
+          1,
+          2,
+          -1,
+          0
+        ],
+        "flags": {
+          "aldryk": "litosc"
+        }
+      },
+      {
+        "id": "grozba",
+        "text": "Wróżba się spełni. Oddaj stół i córkę. Resztę [sam|sama] dobiorę.",
+        "reply": "Przynajmniej nie kłamiesz. Nienawidzę cię czysto.",
+        "points": [
+          -1,
+          -1,
+          2,
+          0
+        ],
+        "flags": {
+          "aldryk": "grozba",
+          "brudne_rece": true
+        }
+      },
+      {
+        "id": "kosci",
+        "text": "Córka, korona, wróżba — tło. Chcę twoje kości. To wszystko.",
+        "reply": "[Pusty|Pusta]. Jak ten mnich z południa. Graj, pusta rzecz.",
+        "points": [
+          0,
+          0,
+          0,
+          2
+        ],
+        "flags": {
+          "aldryk": "kosci"
+        }
+      },
+      {
+        "id": "elara",
+        "text": "Zamknąłeś ją z lęku. Rozumiem lęk. Nie rozumiem wieży. Skończmy to i niech ona zdecyduje, nie my.",
+        "reply": "Ona. Zawsze ona. Dobrze. Niech kości powiedzą, czy ojciec ma jeszcze głos.",
+        "points": [
+          2,
+          1,
+          0,
+          0
+        ],
+        "flags": {
+          "aldryk": "elara_decyduje"
+        }
+      }
+    ],
+    "victory": "Bierz klucz, który już masz, i drzwi, których nienawidzę. Elara jest wolna. Ja — mniej.",
+    "defeat": "Wróżba może poczekać. Ona — też, niestety. Wynoś się, zanim każę błaznowi z powrotem zamknąć kłódkę.",
+    "win_points": [
+      2,
+      1,
+      1,
+      1
+    ],
+    "loss_points": [
+      0,
+      0,
+      0,
+      -2
+    ],
+    "reward": 275,
+    "win_flags": {
+      "elara_wolna": true
+    },
+    "post": [
+      {
+        "id": "oszczedzony",
+        "text": "Zostań na dworze. Bez korony, ale z życiem. Prawo nie wymaga trupa.",
+        "reply": "Prawo. Kiedyś je lubiłem.",
+        "points": [
+          1,
+          2,
+          -1,
+          0
+        ],
+        "flags": {
+          "aldryk_los": "oszczedzony"
+        }
+      },
+      {
+        "id": "wygnany",
+        "text": "Wynoś się. Imię skreślić. Niech cię pamiętają jako lęk.",
+        "reply": "To też korona. Tylko z drugiej strony.",
+        "points": [
+          0,
+          -1,
+          2,
+          0
+        ],
+        "flags": {
+          "aldryk_los": "wygnany",
+          "brudne_rece": true
+        }
+      },
+      {
+        "id": "zignorowany",
+        "text": "Rób co chcesz. Idę do niej, nie do ciebie.",
+        "reply": "…idź.",
+        "points": [
+          2,
+          0,
+          0,
+          1
+        ],
+        "flags": {
+          "aldryk_los": "zignorowany"
+        }
+      },
+      {
+        "id": "runda",
+        "text": "Jeszcze jedna runda, na pożegnanie. Bez tronu.",
+        "reply": "Nie. Dość. [Wygrałeś|Wygrałaś] więcej niż stół.",
+        "points": [
+          0,
+          0,
+          0,
+          2
+        ],
+        "flags": {
+          "aldryk_los": "oszczedzony"
+        }
+      }
+    ]
+  },
+  "6": {
+    "name": "Księżniczka Elara",
+    "narrator": "Ogród, którego nikt nie pielił, odkąd wsadzono ogrodniczkę do wieży. Elara ma suknię prostą i głos, który nie drży dla koron.",
+    "speech": "Dziękuję za drzwi. Nie dziękuję z góry za tron, rękę ani piosenki. Chcę wiedzieć, kim jesteś, gdy nikt nie każe ci być wybawcą. Zagrasz ze mną. Nie o mnie. O to, czy umiem ci zaufać.",
+    "choices": [
+      {
+        "id": "wygoda",
+        "text": "Nie chcę tronu. Chcę ciepłego kąta, jedzenia i żebyś to ty martwiła się mapami. Jestem [leniwy|leniwa]. Lepiej usłyszysz to teraz.",
+        "reply": "…wreszcie ktoś, kto nie chce mnie jako sztandaru. Mogę rządzić. Ty możesz spać do południa. Jeśli wygrasz — rozważę, czy ten układ nie jest najmądrzejszy w tym głupim kraju.",
+        "points": [
+          3,
+          -1,
+          -1,
+          -1
+        ],
+        "flags": {
+          "elara": "wygoda"
+        }
+      },
+      {
+        "id": "prawo",
+        "text": "Chcę rządzić uczciwie. Z tobą albo obok. Według prawa, bez trupów na schodach. Będę pracować.",
+        "reply": "Praca. Prawo. Brzmi jak król, którego nie miałam. Ojciec miał tylko lęk.",
+        "points": [
+          1,
+          3,
+          -1,
+          0
+        ],
+        "flags": {
+          "elara": "prawo"
+        }
+      },
+      {
+        "id": "ambicja",
+        "text": "Chcę korony. Twojej, jego, cesarskiej — kolejność zobaczymy. Możesz być przy mnie, jeśli nie staniesz w poprzek.",
+        "reply": "Przynajmniej nie pakujesz tego w róże. Nie obiecuję ci serca. Obiecuję, że będę patrzeć.",
+        "points": [
+          -2,
+          -1,
+          3,
+          0
+        ],
+        "flags": {
+          "elara": "ambicja",
+          "brudne_rece": true
+        }
+      },
+      {
+        "id": "obojetnosc",
+        "text": "Nie [przyszedłem|przyszłam] po ciebie. [Przyszedłem|Przyszłam] po stół, który jeszcze przede mną. Kobiety, korony — tło.",
+        "reply": "[Szczery|Szczera] jak pusta miska. Zagraj. Potem idź, jeśli kości cię wołają głośniej niż ludzie.",
+        "points": [
+          -2,
+          0,
+          0,
+          3
+        ],
+        "flags": {
+          "elara": "obojetnosc"
+        }
+      },
+      {
+        "id": "cienie",
+        "text": "Dwór jest jedną połową. Drugą mam w alei. Nie będę kłamać.",
+        "reply": "Cienie. Ojciec ich nienawidził, bo nie umiał ich kupić. Ja wolę wiedzieć. Graj. Zaufanie to nie ślepy akt.",
+        "points": [
+          0,
+          -1,
+          1,
+          0
+        ],
+        "flags": {
+          "elara": "cienie"
+        },
+        "requires": "sojusz_vespera"
+      }
+    ],
+    "victory": "Zaufanie nie spada z kości, ale ręka nie kłamała. Idź na finał turnieju. Marszałek nie pyta o wróżby. Ja będę na galerii. Nie jako puchar. Jako świadek.",
+    "defeat": "Kości dziś nie twoje. Zaufanie — też jeszcze nie. To nie wieża. To po prostu «jeszcze nie». Wróć.",
+    "win_points": [
+      2,
+      1,
+      0,
+      1
+    ],
+    "loss_points": [
+      1,
+      0,
+      0,
+      -1
+    ],
+    "reward": 300,
+    "win_flags": {
+      "zaufanie_elary": true
+    },
+    "post": []
+  },
+  "7": {
+    "name": "Marszałek Żelaznych Kości",
+    "narrator": "Arena huczy. Korona leży na poduszce jak ktoś, kto nie chce być włożony na byle głowę. Marszałek Żelaznych Kości nie kłania się hałasowi.",
+    "speech": "Zwycięzca bierze koronę i obowiązek. Nie bierze prawa do bycia bestią. Gram w imieniu stołu, nie w imieniu Aldryka. On już przegrał swoją wróżbę.",
+    "choices": [
+      {
+        "id": "spokoj",
+        "text": "Wezmę koronę, żeby ludzie mogli spać. Nie żeby mnie noszono na rękach.",
+        "reply": "Lenistwo, które nie szkodzi, jest lepsze niż pracowitość, która depcze. Ale ktoś musi podpisywać.",
+        "points": [
+          2,
+          1,
+          -1,
+          0
+        ],
+        "flags": {}
+      },
+      {
+        "id": "praca",
+        "text": "Wezmę koronę i będę nią pracować. Uczciwie. Bez trupów.",
+        "reply": "To król. Rzadki gatunek.",
+        "points": [
+          0,
+          3,
+          -1,
+          0
+        ],
+        "flags": {}
+      },
+      {
+        "id": "cesarstwo",
+        "text": "Wezmę koronę jako pierwszy stopień. Cesarstwo nie zaczyna się od skromności.",
+        "reply": "Słyszę Magnusa, zanim go zobaczysz. Graj. Potem sąd historyczny.",
+        "points": [
+          -1,
+          -1,
+          3,
+          0
+        ],
+        "flags": {}
+      },
+      {
+        "id": "stol",
+        "text": "Koronę możesz zatrzymać. Ja chcę ten stół i nic więcej.",
+        "reply": "Turniej i tak ma zwycięzcę. Korona nie zniknie, bo odwrócisz wzrok. Graj.",
+        "points": [
+          0,
+          0,
+          0,
+          3
+        ],
+        "flags": {}
+      }
+    ],
+    "victory": "Korona twoja. Prawo — też, na razie. Nie zepsuj stołu.",
+    "defeat": "Finał poczeka. Korona też. Nie oddaję jej hałasowi.",
+    "win_points": [
+      1,
+      2,
+      1,
+      1
+    ],
+    "loss_points": [
+      0,
+      1,
+      0,
+      -2
+    ],
+    "reward": 325,
+    "win_flags": {
+      "zostal_krolem": true
+    },
+    "post": []
+  },
+  "8": {
+    "name": "Borys, Książę Kupców",
+    "narrator": "Leśny szlak. Karawany stoją, bo cła gryzą się z bandytami, a bandyci z cłami. Borys ma pierścienie jak pancerz i uśmiech jak faktura.",
+    "speech": "Nowy król. Stare szlaki. Chcę wiedzieć, czy będę płacił prawu, łapówce, czy kościom. Uznam twoje panowanie, jak wygrasz. Warunki — ustalamy ustami, zanim kośćmi.",
+    "choices": [
+      {
+        "id": "spokoj",
+        "text": "Płać cło jak wszyscy. Bez przywilejów. Ja nie będę liczyć twoich wozów po nocach — bo mi się nie chce. Ale oszukiwać też nie dam.",
+        "reply": "[Leniwy sprawiedliwy|Leniwa sprawiedliwa]. Najdroższy gatunek. Graj.",
+        "points": [
+          2,
+          1,
+          0,
+          0
+        ],
+        "flags": {
+          "borys": "spokoj"
+        }
+      },
+      {
+        "id": "prawo",
+        "text": "Prawo jedno dla wozów i koron. Przywilejów nie sprzedaję.",
+        "reply": "Czysto. Drogo. Szanuję.",
+        "points": [
+          0,
+          3,
+          -1,
+          0
+        ],
+        "flags": {
+          "borys": "prawo"
+        }
+      },
+      {
+        "id": "monopol",
+        "text": "Dasz mi szlaki, dam ci wyłączność. Reszta kupców się dostosuje.",
+        "reply": "O. Cesarz w królewskim płaszczu. Lubię jasne ceny.",
+        "points": [
+          -1,
+          -2,
+          3,
+          0
+        ],
+        "flags": {
+          "brudne_rece": true,
+          "borys": "monopol"
+        }
+      },
+      {
+        "id": "stol",
+        "text": "Uznaj albo nie. Gram. Szlaki mnie obchodzą, jak kości przez nie jadą.",
+        "reply": "Mistrz. Najgorszy klient, najlepszy stół.",
+        "points": [
+          0,
+          0,
+          0,
+          3
+        ],
+        "flags": {
+          "borys": "stol"
+        }
+      }
+    ],
+    "victory": "Szlaki twoje, w tym sensie, w jakim szlak może należeć do kogoś. Karawany ruszą. Ja liczę. Ty — rządź, albo śpij, jak wola.",
+    "defeat": "Karawany stoją. Twój tytuł też, na tym trakcie. Wracaj z pełną kieszenią albo pełniejszą ręką.",
+    "win_points": [
+      1,
+      1,
+      1,
+      1
+    ],
+    "loss_points": [
+      0,
+      0,
+      0,
+      -1
+    ],
+    "reward": 350,
+    "win_flags": {
+      "szlaki": true
+    },
+    "post": []
+  },
+  "9": {
+    "name": "Cesarz Magnus",
+    "narrator": "Cesarski dwór jest jaśniejszy i zimniejszy. Magnus nie podnosi głosu. Ludzie podnoszą się sami.",
+    "speech": "Zjednoczenie. Ładne słowo na to, że ktoś kogoś pokonał. Nie jestem smokiem z pieśni Lucjana. Jestem pokój, który boli mniej niż wojna. Pokaż, czy twój pokój boli jeszcze mniej.",
+    "choices": [
+      {
+        "id": "drzemka",
+        "text": "Nie chcę twojego tronu. Chcę, żebyś dał spokój memu królestwu i mojej drzemce. Zagrajmy, żebyś przestał pukać.",
+        "reply": "Drzemka jako polityka zagraniczna. Oryginalne. Groźne, jeśli Elara jest zła.",
+        "points": [
+          2,
+          1,
+          -1,
+          0
+        ],
+        "flags": {
+          "magnus": "drzemka"
+        }
+      },
+      {
+        "id": "traktat",
+        "text": "Zjednoczenie — tak, ale traktatem i stołem, nie stryczkiem. Zostaniesz namiestnikiem, jak przegrasz i przyjmiesz prawo.",
+        "reply": "Prawo. Oferta króla, nie chłopa. Przyjmuję stół. Namiestnictwa nie obiecuję sobie sam.",
+        "points": [
+          0,
+          2,
+          0,
+          0
+        ],
+        "flags": {
+          "magnus": "traktat"
+        }
+      },
+      {
+        "id": "podboj",
+        "text": "Chcę twojego tronu. Cel uświęci ten stół. Jak przegrasz, klękniesz albo znikniesz.",
+        "reply": "Wreszcie wojna bez róż. Graj, [wilku|wilczyco].",
+        "points": [
+          -1,
+          -1,
+          3,
+          0
+        ],
+        "flags": {
+          "magnus": "podboj",
+          "brudne_rece": true
+        }
+      },
+      {
+        "id": "stol",
+        "text": "Tron, pokój, wojna — tło. Chcę pokonać kogoś, kto nigdy nie siada drugi.",
+        "reply": "To już język Aureliusza. Uważaj. On nie wraca z takich zdań.",
+        "points": [
+          0,
+          0,
+          0,
+          3
+        ],
+        "flags": {
+          "magnus": "stol"
+        }
+      }
+    ],
+    "victory": "Zjednoczenie twoje. Ja — nadal żywy, na razie.",
+    "defeat": "Twój pokój boli więcej. Wracaj, aż przestanie.",
+    "win_points": [
+      1,
+      1,
+      2,
+      1
+    ],
+    "loss_points": [
+      0,
+      0,
+      0,
+      -2
+    ],
+    "reward": 375,
+    "win_flags": {
+      "zostal_cesarzem": true
+    },
+    "post": [
+      {
+        "id": "namiestnik",
+        "text": "Zostań namiestnikiem. Prawo jedno.",
+        "reply": "Przyjmuję prawo. Zobaczymy, czy udźwigniesz wszystkie jego krainy.",
+        "points": [
+          1,
+          2,
+          0,
+          0
+        ],
+        "flags": {
+          "magnus_los": "namiestnik"
+        }
+      },
+      {
+        "id": "wygnany",
+        "text": "Wynoś się. Cesarstwo nie potrzebuje starego cienia.",
+        "reply": "Nawet daleko stąd będę słyszał twoje rozkazy.",
+        "points": [
+          0,
+          -1,
+          2,
+          0
+        ],
+        "flags": {
+          "magnus_los": "wygnany",
+          "brudne_rece": true
+        }
+      },
+      {
+        "id": "wolny",
+        "text": "Rób co chcesz. Idę dalej, do prawdziwego stołu.",
+        "reply": "Więc jeszcze nie umiesz usiąść. Idź.",
+        "points": [
+          1,
+          0,
+          0,
+          2
+        ],
+        "flags": {
+          "magnus_los": "wolny"
+        }
+      }
+    ]
+  },
+  "10": {
+    "name": "Lucjan, Bard Stu Stołów",
+    "narrator": "Karczma, w której ściany pamiętają piosenki lepiej niż królów. Lucjan stroi lutnię tak, jak inni stroją armię.",
+    "speech": "Znam sto stołów i trzy korony, które na nich stały. Znam też starca, co karmi kaszą przyszłych mistrzów i mówi, że przegrana przy misce się nie liczy. Brzmi znajomo? Ostatnia pieśń wskaże ci drogę do Aureliusza. Najpierw usiądź. Potem wygraj, bo ja nie śpiewam przegranym adresów.",
+    "choices": [
+      {
+        "id": "spokoj",
+        "text": "Zanuć o kimś, kto wygrał spokój, nie mapę.",
+        "reply": "Pieśń o kominku. Rzadko zamawiana. Droga.",
+        "points": [
+          2,
+          0,
+          -1,
+          0
+        ],
+        "flags": {
+          "lucjan": "princess"
+        }
+      },
+      {
+        "id": "krol",
+        "text": "Zanuć o królu, co nie szedł po trupach.",
+        "reply": "Jeszcze droższa. Ludzie lubią trupy w refrenie.",
+        "points": [
+          0,
+          2,
+          -1,
+          0
+        ],
+        "flags": {
+          "lucjan": "king"
+        }
+      },
+      {
+        "id": "wszystko",
+        "text": "Zanuć o tym, co bierze wszystko.",
+        "reply": "To się śpiewa samo. Cesarze płacą z góry.",
+        "points": [
+          -1,
+          0,
+          2,
+          0
+        ],
+        "flags": {
+          "lucjan": "emperor"
+        }
+      },
+      {
+        "id": "kosci",
+        "text": "Nie chcę pieśni o mnie. Chcę pieśń o kościach, które nie umieją przegrać.",
+        "reply": "Aureliusz. Dobrze. On też nie chce pieśni. Dlatego wszyscy o nim śpiewamy.",
+        "points": [
+          0,
+          0,
+          0,
+          2
+        ],
+        "flags": {
+          "lucjan": "world_champion"
+        }
+      },
+      {
+        "id": "cien",
+        "text": "Zanuć cicho, żeby dwór nie usłyszał, a piwnica tak.",
+        "reply": "Pieśń, której nie zapiszę. Najdroższa.",
+        "points": [
+          1,
+          -1,
+          1,
+          0
+        ],
+        "flags": {
+          "piesn_cienia": true
+        },
+        "requires": "sojusz_vespera"
+      }
+    ],
+    "victory": "Ostatnia pieśń wskaże ci drogę. Posłuchaj.",
+    "defeat": "Nie śpiewam adresów przegranym. Wracaj. Lutnia poczeka. Aureliusz — też, niestety. On poczeka aż za dobrze.",
+    "win_points": [
+      1,
+      1,
+      1,
+      2
+    ],
+    "loss_points": [
+      0,
+      0,
+      0,
+      -1
+    ],
+    "reward": 400,
+    "win_flags": {
+      "droga_do_finalu": true
+    },
+    "post": []
+  },
+  "14": {
+    "name": "Matylda, twoja matka",
+    "narrator": "Na dziedzińcu stoi kobieta w chuście, z koszem. Straż nie wie, czy ją wpuścić. Ty wiesz. To ten głos, który umie wyrzucić z domu i jednocześnie zostawić chleb w oknie.",
+    "speech": "No. Chodzisz w lepszym płaszczu, a uszy te same. Wyrzuciłam cię za {powod}. Nie po to, żebyś [zbierał|zbierała] korony jak grzyby. Po to, żebyś wreszcie [wstał|wstała]. [Wstałeś|Wstałaś]? Bo plotki mówią albo że śpisz na tronie, albo że chcesz cały świat, albo że w ogóle nie patrzysz ludziom w twarz, tylko w kości.",
+    "choices": [
+      {
+        "id": "pokoj",
+        "text": "[Wstałem|Wstałam] akurat tyle, żeby mieć gdzie spać i co jeść. Resztą zajmuje się mądrzejsza osoba.",
+        "reply": "Lenistwo syte. Lepsze niż lenistwo głodne. Nie będę klaskać. Dam ci pieróg.",
+        "points": [
+          2,
+          -1,
+          0,
+          0
+        ],
+        "flags": {
+          "matka": "pokoj"
+        }
+      },
+      {
+        "id": "duma",
+        "text": "Pracuję. Uczciwie. Nie kradnę od swoich. Możesz wrócić do domu bez wstydu.",
+        "reply": "Wstyd był mój, gdy cię wyrzucałam. I twój, gdy [zasłużyłeś|zasłużyłaś]. Siadaj. Zagramy. Ojciec by chciał.",
+        "points": [
+          0,
+          2,
+          -1,
+          0
+        ],
+        "flags": {
+          "matka": "duma"
+        }
+      },
+      {
+        "id": "ostro",
+        "text": "Wyrzuciłaś mnie. Teraz mam więcej niż dom. Nie proszę o pieróg.",
+        "reply": "Nie proś. I tak ci go wsadzę do ręki. A potem przegrasz albo wygrasz, jak wszyscy.",
+        "points": [
+          -1,
+          0,
+          2,
+          0
+        ],
+        "flags": {
+          "matka": "ostro"
+        }
+      },
+      {
+        "id": "kosci",
+        "text": "Nie o to chodziło. Chodziło o kości. Zawsze. Nawet jak [kradłem|kradłam] kaszę.",
+        "reply": "Wiedziałam. Ojciec też taki był. Przegrał ze mną raz i ożenił się z przegraną. Graj, kośćmi ziejący.",
+        "points": [
+          0,
+          0,
+          0,
+          2
+        ],
+        "flags": {
+          "matka": "kosci"
+        }
+      }
+    ],
+    "victory": "Idź do tego mnicha. I wróć. Choćby na zupę. Korony nie myję, ale miski tak.",
+    "defeat": "Widzisz? Domowe kości są złośliwsze niż królewskie. Jeszcze raz. Nie oddam ci świata, dopóki nie umiesz przegrać przy matce.",
+    "win_points": [
+      1,
+      1,
+      0,
+      1
+    ],
+    "loss_points": [
+      1,
+      0,
+      0,
+      -1
+    ],
+    "reward": 50,
+    "win_flags": {
+      "matka_pogodzona": true
+    },
+    "post": [],
+    "before": "Nie daruję ci rozdziału. Daruję ci partię. Wygrana nic nie zmieni w tym, że jesteś moje dziecko. Przegrana też nie."
+  },
+  "11": {
+    "name": "Aureliusz, Mistrz Świata",
+    "narrator": "Klasztor bez dzwonów. Stół z jednego dęba. Aureliusz ma oczy jak wytarte kości: spokojne, prawie niczyje. Na szyi drewniana kostka.",
+    "speech": "Siadaj. Nie witam koron. Nie witam rąk księżniczek. Witam pierwszą osobę od lat, która tu doszła. Nie przegrałem, bo nie chcę nic innego. To nie dumność. To ubóstwo.",
+    "choices": [
+      {
+        "id": "ogrod",
+        "text": "Po tym wracam do ogrodu. Chcę tylko dokończyć, żeby mieć spokój.",
+        "reply": "Spokój. Jedyna wygrana, której nie umiem. Graj.",
+        "points": [
+          2,
+          0,
+          0,
+          -1
+        ],
+        "flags": {}
+      },
+      {
+        "id": "obowiazek",
+        "text": "Po tym wracam rządzić uczciwie. Ten stół ma być ostatnim obowiązkiem, nie pierwszym głodem.",
+        "reply": "Obowiązek. Cięższy od kości. Dobrze.",
+        "points": [
+          0,
+          2,
+          0,
+          0
+        ],
+        "flags": {}
+      },
+      {
+        "id": "imie",
+        "text": "Po tym świat ma jedno imię. Moje.",
+        "reply": "Imiona pękają. Kości nie. Graj, cesarzu głodu.",
+        "points": [
+          0,
+          0,
+          2,
+          0
+        ],
+        "flags": {}
+      },
+      {
+        "id": "tylko",
+        "text": "Nie ma «po tym». Jest tylko to.",
+        "reply": "Wtedy jesteś mną, zanim przegrałem. Dobrze. Wreszcie.",
+        "points": [
+          -1,
+          -1,
+          0,
+          3
+        ],
+        "flags": {}
+      },
+      {
+        "id": "znikne",
+        "text": "Po tym zniknę. Świat nie musi wiedzieć, kto wygrał.",
+        "reply": "Cień. Jedyny mistrz, którego pieśń nie znosi. Graj.",
+        "points": [
+          1,
+          0,
+          1,
+          1
+        ],
+        "flags": {},
+        "requires": "sojusz_vespera"
+      }
+    ],
+    "victory": "Dziękuję. Mogę usiąść. Nie jako mistrz. Jako ktoś, kto wreszcie ma prawo przegrać. Idź. Wybierz, kim jesteś, gdy kości milczą. Ja zostanę przy kaszy. Znam starca, który mówi, że przegrana przy misce się nie liczy. Teraz rozumiem, czemu kłamał.",
+    "defeat": "Jeszcze nie. Wracaj. Nie złoszczę się. Ja mam czas. Ty masz życie, którego nie zjadłem. Nie zmarnuj go na jedną przegraną.",
+    "win_points": [
+      1,
+      1,
+      1,
+      2
+    ],
+    "loss_points": [
+      1,
+      0,
+      0,
+      -2
+    ],
+    "reward": 425,
+    "win_flags": {
+      "mistrz_swiata": true
+    },
+    "post": []
+  }
+}

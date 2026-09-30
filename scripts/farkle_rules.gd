@@ -1,6 +1,8 @@
 class_name FarkleRules
 extends RefCounted
 
+const STORY_TEXT := preload("res://scripts/story_text.gd")
+
 
 static func score_dice(values: Array[int]) -> Dictionary:
 	if values.is_empty():
@@ -19,7 +21,7 @@ static func score_dice(values: Array[int]) -> Dictionary:
 		if counts[face] == 0:
 			full_straight = false
 	if full_straight:
-		return {"valid": true, "score": 1500, "label": "strit 1–6"}
+		return {"valid": true, "score": 1500, "label": STORY_TEXT.text("strit 1–6")}
 
 	var low_straight := true
 	for face in range(1, 6):
@@ -27,7 +29,7 @@ static func score_dice(values: Array[int]) -> Dictionary:
 			low_straight = false
 	if low_straight:
 		total += 500
-		descriptions.append("strit 1–5")
+		descriptions.append(STORY_TEXT.text("strit 1–5"))
 		for face in range(1, 6):
 			counts[face] -= 1
 	else:
@@ -37,7 +39,7 @@ static func score_dice(values: Array[int]) -> Dictionary:
 				high_straight = false
 		if high_straight:
 			total += 750
-			descriptions.append("strit 2–6")
+			descriptions.append(STORY_TEXT.text("strit 2–6"))
 			for face in range(2, 7):
 				counts[face] -= 1
 
@@ -50,12 +52,12 @@ static func score_dice(values: Array[int]) -> Dictionary:
 			descriptions.append("%d×%d" % [amount, face])
 		elif face == 1 and amount > 0:
 			total += amount * 100
-			descriptions.append("%d×jedynka" % amount)
+			descriptions.append(STORY_TEXT.text("%d×jedynka") % amount)
 		elif face == 5 and amount > 0:
 			total += amount * 50
-			descriptions.append("%d×piątka" % amount)
+			descriptions.append(STORY_TEXT.text("%d×piątka") % amount)
 		elif amount > 0:
-			return {"valid": false, "score": 0, "label": "Te kości nie tworzą punktowanego zestawu"}
+			return {"valid": false, "score": 0, "label": STORY_TEXT.text("Te kości nie tworzą punktowanego zestawu")}
 
 	return {
 		"valid": total > 0,

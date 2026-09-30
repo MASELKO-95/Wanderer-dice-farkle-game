@@ -43,6 +43,20 @@ func _run() -> void:
 	if table.match_state.current_dice.size() != 6:
 		_fail("autorytatywny host nie wykonał rzutu")
 		return
+	table.match_state.phase = TableMatch.PHASE_SELECT
+	table.match_state.current_dice.assign([1, 5, 2])
+	table.match_state.current_types.assign([1, 1, 1])
+	table.match_state.selected.clear()
+	table._render_dice()
+	await process_frame
+	for key in [KEY_RIGHT, KEY_Z]:
+		var event := InputEventKey.new()
+		event.keycode = key
+		event.pressed = true
+		Input.parse_input_event(event)
+		await process_frame
+	assert(table.match_state.selected == [1])
+	print("PASS: multiplayer keyboard selection")
 	print("PASS: lobby host + 3 boty, start stołu i autorytatywny rzut")
 	session.disconnect_session()
 	table._flow_token += 1

@@ -1,6 +1,8 @@
 class_name TableMatch
 extends RefCounted
 
+const STORY_TEXT := preload("res://scripts/story_text.gd")
+
 const PHASE_AWAIT_ROLL := "await_roll"
 const PHASE_SELECT := "select"
 const PHASE_FARKLE := "farkle"
@@ -21,6 +23,7 @@ var roll_id := 0
 var revision := 0
 var event_id := 0
 var last_event := ""
+var last_event_parts: Array = []
 var rng := RandomNumberGenerator.new()
 
 
@@ -36,7 +39,7 @@ func setup(initial_seats: Array, new_target_score: int, seed: int) -> void:
 		seats.append({
 			"seat": index,
 			"peer_id": int(source.get("peer_id", -1)),
-			"nickname": str(source.get("nickname", "Gracz")).left(18),
+			"nickname": str(source.get("nickname", STORY_TEXT.text("Gracz"))).left(18),
 			"is_bot": bool(source.get("is_bot", false)),
 			"loadout": loadout,
 			"avatar_id": str(source.get("avatar_id", "procedural")).left(96),
@@ -49,7 +52,7 @@ func setup(initial_seats: Array, new_target_score: int, seed: int) -> void:
 	revision = 0
 	event_id = 0
 	roll_id = 0
-	_start_turn("Rozpoczyna %s." % active_player().nickname)
+	_start_turn([{ "text": "Rozpoczyna %s.", "args": [active_player().nickname] }])
 
 
 func active_player() -> Dictionary:
@@ -73,10 +76,10 @@ func roll(peer_id: int, force_bot := false) -> bool:
 	selected.clear()
 	phase = PHASE_SELECT
 	roll_id += 1
-	_touch("%s rzuca: %s" % [active_player().nickname, _dice_text(current_dice)])
+	_touch([{ "text": "%s rzuca: %s", "args": [active_player().nickname, _dice_text(current_dice)] }])
 	if not FarkleRules.best_scoring_subset(current_dice).valid:
 		phase = PHASE_FARKLE
-		_touch("FARKLE! %s traci %d pkt z tej tury." % [active_player().nickname, turn_score])
+		_touch([{ "text": "FARKLE! %s traci %d pkt z tej tury.", "args": [active_player().nickname, turn_score] }])
 	return true
 
 
@@ -88,7 +91,7 @@ func toggle_die(peer_id: int, index: int) -> bool:
 	else:
 		selected.append(index)
 	selected.sort()
-	_touch("", false)
+	_touch([], false)
 	return true
 
 
@@ -101,7 +104,7 @@ func set_bot_selection(indices: Array) -> bool:
 		if index >= 0 and index < current_dice.size() and index not in selected:
 			selected.append(index)
 	selected.sort()
-	_touch("", false)
+	_touch([], false)
 	return true
 
 
@@ -134,11 +137,9 @@ func keep_and_continue(peer_id: int, force_bot := false) -> bool:
 	current_types.clear()
 	selected.clear()
 	phase = PHASE_AWAIT_ROLL
-	_touch("%s odkłada %s (+%d)%s" % [
-		active_player().nickname,
-		_dice_text(values),
-		result.score,
-		" — gorące kości!" if hot_dice else "."
+	_touch([
+		{"text": "%s odkłada %s (+%d)", "args": [active_player().nickname, _dice_text(values), result.score]},
+		{"text": "— gorące kości!" if hot_dice else ".", "args": []}
 	])
 	return true
 
@@ -156,16 +157,16 @@ func bank(peer_id: int, force_bot := false) -> bool:
 	if int(seats[active_seat].score) >= target_score:
 		winner_seat = active_seat
 		phase = PHASE_GAME_OVER
-		_touch("%s wygrywa z wynikiem %d pkt!" % [name, seats[active_seat].score])
+		_touch([{ "text": "%s wygrywa z wynikiem %d pkt!", "args": [name, seats[active_seat].score] }])
 	else:
-		_advance_turn("%s zapisuje %d pkt." % [name, banked])
+		_advance_turn([{ "text": "%s zapisuje %d pkt.", "args": [name, banked] }])
 	return true
 
 
 func resolve_farkle() -> bool:
 	if phase != PHASE_FARKLE:
 		return false
-	_advance_turn("")
+	_advance_turn([])
 	return true
 
 
@@ -207,7 +208,8 @@ func snapshot() -> Dictionary:
 		"roll_id": roll_id,
 		"revision": revision,
 		"event_id": event_id,
-		"last_event": last_event
+		"last_event": last_event,
+		"last_event_parts": last_event_parts.duplicate(true)
 	}
 
 
@@ -232,17 +234,18 @@ func apply_snapshot(data: Dictionary) -> bool:
 	revision = incoming_revision
 	event_id = int(data.get("event_id", 0))
 	last_event = str(data.get("last_event", ""))
+	last_event_parts = data.get("last_event_parts", []).duplicate(true)
 	return true
 
 
-func _advance_turn(prefix: String) -> void:
+func _advance_turn(prefix: Array) -> void:
 	if seats.is_empty():
 		return
 	active_seat = (active_seat + 1) % seats.size()
-	_start_turn(("%s " % prefix) if not prefix.is_empty() else "")
+	_start_turn(prefix)
 
 
-func _start_turn(prefix: String) -> void:
+func _start_turn(prefix: Array) -> void:
 	turn_score = 0
 	current_dice.clear()
 	current_types.clear()
@@ -250,8 +253,8 @@ func _start_turn(prefix: String) -> void:
 	kept.clear()
 	phase = PHASE_AWAIT_ROLL
 	active_types = active_player().loadout.duplicate()
-	var message := "%sTura: %s." % [prefix, active_player().nickname]
-	_touch(message.strip_edges())
+	prefix.append({"text":"Tura: %s.", "args":[active_player().nickname]})
+	_touch(prefix)
 
 
 func _selected_values() -> Array[int]:
@@ -261,11 +264,23 @@ func _selected_values() -> Array[int]:
 	return values
 
 
-func _touch(event_text: String, add_event := true) -> void:
+func _touch(parts: Array, add_event := true) -> void:
 	revision += 1
-	if add_event and not event_text.is_empty():
+	if add_event and not parts.is_empty():
 		event_id += 1
-		last_event = event_text
+		last_event_parts = parts.duplicate(true)
+		last_event = event_text()
+
+
+func event_text() -> String:
+	if last_event_parts.is_empty():
+		return last_event
+	var messages: Array[String] = []
+	for part in last_event_parts:
+		var message := STORY_TEXT.text(str(part.get("text","")))
+		var args: Array = part.get("args",[])
+		messages.append(message % args if not args.is_empty() else message)
+	return " ".join(messages)
 
 
 func _int_array(source: Array) -> Array[int]:

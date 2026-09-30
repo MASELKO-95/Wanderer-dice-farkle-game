@@ -1,8 +1,11 @@
 # Wanderer dice farkle game
 
-> **Version 0.8 Alpha — pre-release (`0.8.0-alpha`).** The campaign and
-> character models are being reworked. This version is playable, but its
-> content, visuals and save format may still change.
+> **Version 0.9.0 (Beta).** The campaign (*Kroniki Kostek* / *Chronicles of Dice*)
+> is now complete with all story chapters, side tables, choices and five endings.
+> Full Polish and English localizations are available; other language selections
+> currently fall back to English (additional language improvements will follow).
+> Achievements are fully implemented in the game and will receive an updated,
+> improved visual format in upcoming updates.
 
 You begin as a poor peasant thrown out of your home. You have no money,
 influence or place to return to — just six ordinary dice and a chance to
@@ -12,23 +15,25 @@ at the gaming table. Where that road takes you is up to you.
 **Wanderer dice farkle game** is a dice game inspired by the Farkle system in
 *Kingdom Come: Deliverance*. Set aside scoring dice, build your loadout, and
 decide whether to bank your points or risk another roll. The current version
-includes an early campaign, quick matches against bots, and ENet multiplayer
+includes the Chronicles of Dice campaign, quick matches against bots, and ENet multiplayer
 for 2–4 players. The host can fill empty seats with bots.
 
-A larger story campaign with multiple endings and meaningful choices is
-planned. The medieval setting is only the beginning: other themes and
-settings, including modern ones, are also planned. The full campaign and
-additional settings are development goals.
+The campaign has branching dialogue and five endings. The medieval setting
+is only the beginning: other themes and settings, including modern ones,
+are also planned. Polish and English cover the interface and campaign.
+Other language selections currently use English placeholders throughout, with
+improved translations for other languages planned in upcoming updates.
 
 **Creator:** [MASELKO-95](https://github.com/MASELKO-95)
 
 ## Features
 
-- A campaign with dialogue, choices, silver, wagers and a dice shop.
+- Chronicles of Dice: 15 story encounters, six side tables, choices and five endings.
+- Campaign achievements, silver, optional wagers and a dice shop.
 - Quick matches against bots with several difficulty levels.
 - ENet multiplayer for 2–4 players, with bots filling vacant seats.
 - Special weighted dice and custom loadouts.
-- Multiple languages, character customization and mod support.
+- Polish and English, character customization and mod support.
 - Desktop export support for Windows and Linux.
 
 ## License
@@ -48,15 +53,51 @@ Commercial use of material covered by CC BY-NC requires separate permission
 from the creator.
 
 ## Running the project
+ 
+Anyone who downloads or clones the repository can play immediately without
+needing a pre-exported build:
 
-1. Open `project.godot` in Godot 4.7.2 or later.
-2. Press **F5** to run the project, or **F6** to run the current scene.
+1. Open `project.godot` in Godot Engine (version 4.7.2 or later).
+2. Press **F5** to run the game, or **F6** to run the current scene.
+Alternatively, from terminal run: `godot --path .`
 
 You can preview the tavern without running the game by opening
 `scenes/tavern_world.tscn`. Its `@tool` script previews procedural geometry,
 with markers for four seats and the center of the dice area.
 
 ## Campaign silver and the dice shop
+
+**Kroniki Kostek** starts with a tutorial to 500 points. The twelve main
+chapters are joined by Gromek (1B), Vespera (2B) and Matylda (11B). After
+Tomek, six courtyard matches award 280 silver in total before the journey
+continues. These side games have short dialogue
+without story choices or wagers.
+
+The campaign follows a continuous route: **Continue** advances from each
+dialogue to the next encounter, including side matches and retries. There
+is no chapter-selection list. **Pause / Shop** opens the campaign overview;
+you can shop, manage saves, and resume the same dialogue with **Continue**.
+Story choices and early endings remain available along the route.
+
+Choices shape four routes: a comfortable life with Elara, an honest crown,
+the imperial throne, or mastery of dice. The player chooses among unlocked
+endings; a fifth ending stays hidden until its story conditions are met.
+The usual threshold is eight points, with additional story unlocks. Earlier
+endings are offered after the Marshal and Magnus. Elara remains the princess
+for either player gender.
+
+Defeats normally require a retry. The tutorial, Tomek and Gromek let the
+story continue; Morgana and Matylda also allow passage after two defeats.
+Story choices and their points are recorded once, so replaying a chapter
+does not repeat its choice rewards.
+
+The **Achievements** menu tracks ten achievements across save slots. Achievements
+are already fully functional in this version, with a redesigned, more polished visual
+format planned in an upcoming update. Finish without buying dice or placing a wager
+to earn **Czyste ręce, zwykłe kości** and an extra epilogue line. Console-forced
+results disqualify that campaign; older saves with unknown purchase/wager history
+cannot earn the clean-run achievement. Achievements are stored locally in
+`user://achievements.cfg`.
 
 The main menu uses a vertical button list. Character, language, dice and
 quick-match opponent settings are under **Character & settings**.
@@ -67,7 +108,10 @@ settings. Multiplayer then opens the lobby, where the host sets the shared
 target score.
 
 The language selector is also available in the bottom-left corner. Changing
-language during dialogue preserves the current line and choices.
+language during dialogue preserves the current line and choices. Polish
+and English are complete; other locales are marked **(English)** and use
+English for both menus and story. Their older partial translations remain
+in the source data for future work but are not mixed into the active UI.
 
 **Campaign** opens six save slots, each with independent progress, silver,
 collection, choices and ending. **Save a separate path** copies your progress
@@ -84,8 +128,9 @@ first coins at the table, then open the **Dice shop** from the campaign
 screen. Select one of six loadout slots to buy or equip a die. Each purchase
 buys one die and equips it immediately; you can own up to six of each type.
 
-The standard first-win reward is 150 silver plus 25 for each subsequent
-chapter (150 in the first, 175 in the second, and so on). Repeat wins award
+Tomek awards 155 silver, including his five-silver gift. Later main chapters
+award 175–425 silver in increments of 25. Gromek, Vespera and Matylda award
+80, 120 and 50 respectively. Repeat main-chapter wins award
 50 plus 10 per subsequent chapter. Losing does not deduct silver except for
 an agreed wager. Special dice cost 40–480 silver. You can visit the shop
 after losing and before retrying. The opening tutorial and story rewards
@@ -95,8 +140,10 @@ Your purse, collection and campaign loadout save automatically. Legacy saves
 receive silver for previously completed chapters. The campaign has its own
 loadout; quick matches and multiplayer retain unlocks based on match count.
 
-Selected opponents accept optional wagers: the thief up to 100, the jester
-up to 200, and the merchant up to 500 silver. Negotiate the stake in dialogue,
+Selected opponents accept optional wagers: Gromek up to 20, the thief up to
+100, Vespera up to 150, the jester up to 200, and the merchant up to 500 silver.
+Each paid wager changes route points by king −2, emperor +1 and master +1.
+Negotiate the stake in dialogue,
 confirm the terms, or choose to play without a wager. The stake is deducted
 when the match begins. A win pays twice the stake including its return
 (stake 25, receive 50, profit 25), in addition to the regular victory reward.
@@ -106,14 +153,27 @@ accept wagers.
 
 ## Controls
 
-- **Space** — roll.
+- **Arrow keys** — move the blue cursor between dice.
+- **Z / Space / Enter** — select or deselect the indicated die.
+- **Space** before a roll — roll.
 - **E** — hold or release the die under the cursor.
 - **F** — confirm selected dice and roll the remaining dice.
 - **Q** — bank points and end your turn.
-- **Enter** — alternative key for banking points.
 - **Right mouse button + mouse movement** — look around slightly.
 
-## LAN multiplayer and playit.gg
+## Room codes, LAN multiplayer and playit.gg
+
+After creating a table, the host enters a reachable public IP (or UDP tunnel
+address), including the external port if different, and clicks **Create code**
+and **Copy code**. Guests paste the complete `F2-…` or legacy `FK1-…` code in the join field.
+Codes encode the address; they are not passwords and do not open router ports.
+The host still needs UDP forwarding/firewall access or a working tunnel.
+For LAN games, the host can generate a code from their local address.
+IPv4 codes use 11 characters (including `F2-`) for port 7777, or 15 for
+a custom port. They accept lowercase and include a checksum for typing errors.
+Tunnel hostnames and IPv6 retain the longer `FK1-` format. Old codes still work.
+There is no global room directory: that requires a shared discovery server.
+
 
 The host selects **Multiplayer**, sets a UDP port (7777 by default), creates
 a table, adds any bots and starts the match. Players on the same LAN enter
@@ -221,12 +281,12 @@ over the network.
 
 ## Packaging a Game Jolt release
 
-Run `tools/package_gamejolt.sh 0.8.0-alpha` to export and package separate
-Linux and Windows builds in `build/gamejolt/0.8.0-alpha/`. This requires
+Run `tools/package_gamejolt.sh 0.9.0` to export and package separate
+Linux and Windows builds in `build/gamejolt/0.9.0/`. This requires
 Godot 4.7.2 with export templates installed, plus `zip`.
 
-**0.8 Alpha** is a pre-release: the campaign is unfinished and character
-models are being reworked.
+**0.9.0** features a complete campaign route, with ongoing polish for visual
+styling and additional language translations.
 
 ## Tests
 
@@ -234,6 +294,14 @@ models are being reworked.
 godot --headless --path . --script tests/rules_test.gd
 godot --headless --path . --script tests/table_match_test.gd
 godot --headless --path . --script tests/campaign_test.gd
+godot --headless --path . --script tests/chronicles_rules_test.gd
+godot --headless --path . --script tests/chronicles_game_test.gd
+godot --headless --path . --script tests/chronicles_branches_test.gd
+godot --headless --path . --script tests/chronicles_localization_test.gd
+godot --headless --path . --script tests/chronicles_game_test.gd -- en
+godot --headless --path . --script tests/chronicles_game_test.gd -- ja
+godot --headless --path . --script tests/campaign_wager_test.gd
+godot --headless --path . --script tests/campaign_saves_test.gd
 godot --headless --path . --script tests/dialogue_test.gd
 godot --headless --path . --script tests/localization_test.gd
 godot --headless --path . --script tests/game_smoke_test.gd
@@ -245,3 +313,46 @@ at the same time: one with the `host` argument and one with `client`.
 Special-dice weights are based on the public
 [KCD Wiki — Dice](https://kingdomcomedeliverance.wiki.gg/wiki/Dice) table.
 The project's original art and code do not use models or sounds from KCD.
+
+
+## Hidden console
+
+Enter **Up, Up, Down, Down, Left, Right, Left, Right, B, A** to unlock
+and open the console for this session. **`** toggles it; **Escape** closes it.
+Typing in the console does not trigger dice shortcuts. `help` lists commands.
+
+- `win` / `lose`: give the target score to yourself / your opponent and finish
+  the active match. Normal campaign rewards/progression apply. In multiplayer,
+  only the host can use these commands; `lose` picks the first other seat.
+- `quickbattle`: leave the current screen/session and start a solo quick battle
+  with your current quick-match settings.
+- `join 203.0.113.9:7777` or `join F2-…`: leave the current session and join
+  the given lobby. `join(203.0.113.9:7777)` also works.
+- `exit(5)`: save and quit after five seconds. `exit` quits immediately;
+  another `exit` command replaces the countdown (0–86400 seconds).
+- `setlang "pl"` or `setlang "en"`: change and save the language.
+  `help` lists all supported language codes.
+
+
+## Clickable invitations (Windows and Linux)
+
+1. In the exported game, each recipient opens Multiplayer → Lobby and clicks
+   **Enable invite links** once. This associates `wanderer-farkle:` links with
+   that copy of the game for the current OS user. Repeat after moving the game.
+2. The host creates a table, enters a reachable public IP or UDP tunnel address,
+   generates a code, and clicks **Copy link**.
+3. Opening `wanderer-farkle://join/CODE` starts a new game process and joins the
+   lobby automatically. A browser may ask to open the external application.
+   Close an existing game first if you do not want a second process.
+
+If a messenger does not make custom links clickable, paste the entire link into
+Lobby's join field or use `join LINK` in the console. No web invitation service
+is hosted by this project. Links still require an available host and reachable
+UDP port, just like codes. Android registration is not implemented.
+
+The game accepts invitation URLs after `--`, or `-- --join ADDRESS_OR_CODE`.
+Launching from the editor does not register the editor as a protocol handler.
+Linux uses a per-user `.desktop` file plus `xdg-mime`; Windows uses
+`HKCU\Software\Classes\wanderer-farkle`.
+See the [desktop entry specification](https://specifications.freedesktop.org/desktop-entry/latest-single/)
+and [Windows per-user class registration](https://learn.microsoft.com/en-us/windows/win32/sysinfo/hkey-classes-root-key).

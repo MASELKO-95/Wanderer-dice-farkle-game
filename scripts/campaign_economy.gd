@@ -21,7 +21,7 @@ func can_buy(type_index: int) -> bool:
 
 
 func place_wager(chapter_index: int, amount: int) -> bool:
-	if chapter_index < 0 or chapter_index >= CAMPAIGN.CHAPTERS.size():
+	if CAMPAIGN.chapter(chapter_index).is_empty():
 		return false
 	if active_wager != 0 or amount < 0 or amount > silver or amount > CAMPAIGN.wager_limit(chapter_index):
 		return false

@@ -168,8 +168,19 @@ func _after_text_revealed() -> void:
 			var choice_key := str(choice.get("text_key"))
 			var choice_text := _translate(choice_key) if not choice_key.is_empty() else str(choice.get("text"))
 			var button := Button.new()
-			button.text = _gender_text(choice_text)
-			button.custom_minimum_size.y = 36
+			button.text = ""
+			var caption := Label.new()
+			caption.text = _gender_text(choice_text)
+			caption.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			caption.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			caption.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+			caption.offset_left = 12
+			caption.offset_right = -12
+			caption.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+			button.add_child(caption)
+			var font := caption.get_theme_font("font")
+			var text_size := font.get_multiline_string_size(caption.text,HORIZONTAL_ALIGNMENT_LEFT,maxf(300,get_viewport_rect().size.x * 0.86 - 100),caption.get_theme_font_size("font_size"))
+			button.custom_minimum_size.y = maxf(40,text_size.y + 16)
 			button.add_theme_color_override("font_color", Color("#f1e7cf"))
 			button.add_theme_stylebox_override("normal", _panel_style(Color("#4b3827"), Color("#9b753f"), 2, 6))
 			button.pressed.connect(_select_choice.bind(choice))
@@ -304,7 +315,11 @@ func _build_interface() -> void:
 	margin.add_theme_constant_override("margin_right", 24)
 	margin.add_theme_constant_override("margin_top", 16)
 	margin.add_theme_constant_override("margin_bottom", 14)
-	dialogue_panel.add_child(margin)
+	var scroll := ScrollContainer.new()
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	dialogue_panel.add_child(scroll)
+	margin.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.add_child(margin)
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 8)
 	margin.add_child(box)

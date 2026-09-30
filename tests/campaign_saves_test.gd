@@ -20,13 +20,13 @@ func run() -> void:
 	game._activate_campaign_slot(0)
 	game.campaign_progress = 12
 	game.campaign_economy.silver = 300
-	game._show_campaign_dialogue(11, "victory")
+	game._show_campaign_dialogue(11, "coronation")
 	var dialogue: Control = game.active_dialogue
 	dialogue.finish_dialogue()
 	check(not dialogue._ending, "final choice cannot be skipped")
 	check(game._copy_campaign_slot(1), "copy before ending decision")
 	check(not game._copy_campaign_slot(1), "copy never overwrites existing slot")
-	dialogue._select_choice(dialogue._current_lines[0].choices[1])
+	dialogue._select_choice(dialogue._current_lines[0].choices[2])
 	await process_frame
 	check(game.campaign_ending == "emperor" and game.campaign_choices.size() == 1, "choice and ending recorded")
 	game._activate_campaign_slot(1)

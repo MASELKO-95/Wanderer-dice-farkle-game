@@ -1,5 +1,7 @@
 extends Control
 
+const STORY_TEXT := preload("res://scripts/story_text.gd")
+
 var target_score := 4000
 const GOLD := Color("#e3bd62")
 const PALE_GOLD := Color("#f4dfaa")
@@ -8,10 +10,13 @@ const MUTED := Color("#b8a98e")
 const GREEN := Color("#597a43")
 const RED := Color("#9d493b")
 const DIE_GLYPHS := ["1", "2", "3", "4", "5", "6"]
+const INVITE_LINKS := preload("res://scripts/invite_links.gd")
 const SAVE_PATH := "user://farkle_progress.cfg"
 const TAVERN_WORLD_SCENE := preload("res://scenes/tavern_world.tscn")
 const CAMPAIGN_CATALOG := preload("res://scripts/campaign_catalog.gd")
 const CAMPAIGN_ECONOMY := preload("res://scripts/campaign_economy.gd")
+const CHRONICLES := preload("res://scripts/campaign_chronicles.gd")
+const ACHIEVEMENTS := preload("res://scripts/campaign_achievements.gd")
 const CAMPAIGN_OPENING := preload("res://scripts/campaign_opening.gd")
 const CAMPAIGN_SAVES := preload("res://scripts/campaign_saves.gd")
 const WAGER_DIALOGUE := preload("res://scripts/wager_dialogue.gd")
@@ -93,6 +98,7 @@ var quick_match_settings: Dictionary = {}
 var campaign_ending := ""
 var campaign_slot := 0
 var campaign_story: Dictionary = {}
+var achievements := ACHIEVEMENTS.new()
 var campaign_tutorial := false
 var campaign_choices: Array = []
 var campaign_checkpoint: Dictionary = {}
@@ -209,6 +215,8 @@ func _ready() -> void:
 	_ensure_audio_buses()
 	AssetLibrary.refresh_mod_catalog()
 	_load_progress()
+	CHRONICLES.initialize(campaign_story, campaign_progress)
+	achievements.read_save()
 	if bot_name.is_empty():
 		bot_name = I18n.translate(str(BotBrain.profile(bot_profile_id).name_key))
 	_apply_audio_settings()
@@ -237,8 +245,46 @@ func _ready() -> void:
 	
 	show_main_menu()
 	_build_language_selector()
+	developer_console = preload("res://scripts/developer_console.gd").new()
+	developer_console.game = self
+	add_child(developer_console)
+	var invitation := INVITE_LINKS.startup_invitation(OS.get_cmdline_user_args())
+	if not invitation.is_empty():
+		_join_invitation.call_deferred(invitation)
+
+var developer_console: CanvasLayer
+var keyboard_die := 0
+
+
+func _input(event: InputEvent) -> void:
+	if is_instance_valid(developer_console) and developer_console.handle_key(event):
+		return
+	if current_menu != "game" or is_instance_valid(active_dialogue) or not current_is_player or not dice_rolled:
+		return
+	if not event is InputEventKey or not event.pressed or event.echo:
+		return
+	if event.alt_pressed or event.ctrl_pressed or event.meta_pressed:
+		return
+	var count := current_dice.size()
+	if count == 0:
+		return
+	keyboard_die = clampi(keyboard_die, 0, count - 1)
+	if event.keycode in [KEY_LEFT, KEY_UP, KEY_RIGHT, KEY_DOWN]:
+		keyboard_die = posmod(keyboard_die + (-1 if event.keycode in [KEY_LEFT, KEY_UP] else 1), count)
+	elif event.keycode in [KEY_Z, KEY_SPACE, KEY_ENTER, KEY_KP_ENTER]:
+		_on_die_pressed(keyboard_die)
+	else:
+		return
+	for child in dice_row.get_children():
+		if child is DieView and not child.is_queued_for_deletion():
+			child.keyboard_cursor = child.die_index == keyboard_die
+			child.queue_redraw()
+	get_viewport().set_input_as_handled()
+
 
 func _unhandled_key_input(event: InputEvent) -> void:
+	if is_instance_valid(developer_console) and developer_console.is_open():
+		return
 	if is_instance_valid(active_dialogue):
 		return
 	if not event is InputEventKey:
@@ -256,7 +302,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	elif key_event.keycode == KEY_F and is_instance_valid(keep_button) and keep_button.visible and not keep_button.disabled:
 		_on_keep_and_roll()
 		get_viewport().set_input_as_handled()
-	elif key_event.keycode in [KEY_Q, KEY_ENTER] and is_instance_valid(bank_button) and not bank_button.disabled:
+	elif key_event.keycode in [KEY_Q] and is_instance_valid(bank_button) and not bank_button.disabled:
 		_on_bank_pressed()
 		get_viewport().set_input_as_handled()
 
@@ -314,10 +360,11 @@ func show_main_menu() -> void:
 	spacer.custom_minimum_size.y = 16
 	column.add_child(spacer)
 	var entries := [
-		["menu_campaign", _show_campaign_saves],
 		["quick_match_btn", _show_setup_menu.bind("quick")],
 		["multiplayer_btn", _show_setup_menu.bind("multiplayer")],
+		["menu_campaign", _show_campaign_saves],
 		["menu_profile", _show_setup_menu],
+		["achievements", _show_achievements],
 		["sound_settings", _show_audio_settings],
 		["rules_btn", _show_rules]
 	]
@@ -918,7 +965,7 @@ func _make_player_card(is_player: bool) -> PanelContainer:
 	
 	details.add_child(_label(player_name if is_player else bot_name, 20, CREAM))
 	
-	var score := _label("0 pkt", 24, GOLD if is_player else PALE_GOLD)
+	var score := _label(STORY_TEXT.text("0 pkt"), 24, GOLD if is_player else PALE_GOLD)
 	details.add_child(score)
 	
 	var progress := ProgressBar.new()
@@ -1245,52 +1292,21 @@ func _run_bot_turn(token: int) -> void:
 		await get_tree().create_timer(0.55).timeout
 
 func _show_winner(player_won: bool) -> void:
-	if campaign_tutorial:
-		if match_recorded:
-			return
-		match_recorded = true
-		game_token += 1
-		campaign_tutorial = false
-		campaign_story["prologue_done"] = true
-		campaign_story["porridge"] = true
-		campaign_story["ticket"] = true
-		_show_campaign_dialogue(0, "tutorial_victory" if player_won else "tutorial_defeat", _show_campaign_screen)
+	if campaign_active:
+		_finish_chronicles_match(player_won)
 		return
 	if match_recorded:
 		return
 	_play_sfx("win_fanfare")
 	game_token += 1
 	var unlock_message := ""
-	var campaign_message := ""
-	var wager_message := ""
 	
 	if not match_recorded:
 		var previous_matches := matches_played
 		matches_played += 1
-		if campaign_active:
-			var stake: int = campaign_economy.active_wager
-			var payout: int = campaign_economy.settle_wager(player_won)
-			if stake > 0:
-				wager_message = I18n.translate("wager_won", [payout, stake]) if player_won else I18n.translate("wager_lost", [stake])
 		if player_won:
 			matches_won += 1
 			_commit_winning_player_learning()
-			if campaign_active:
-				var old_campaign_progress := campaign_progress
-				campaign_progress = CAMPAIGN_CATALOG.advance(campaign_progress, campaign_current_index)
-				campaign_message = I18n.translate("campaign_chapter_victory")
-				var reward := CAMPAIGN_ECONOMY.victory_reward(campaign_current_index, campaign_progress > old_campaign_progress)
-				campaign_economy.silver += reward
-				campaign_message += "\n" + I18n.translate("silver_reward", [reward, campaign_economy.silver])
-				if campaign_progress > old_campaign_progress:
-					var milestone_key: String = CAMPAIGN_CATALOG.milestone_key_for_progress(campaign_progress)
-					if not milestone_key.is_empty():
-						campaign_message += "\n" + I18n.translate("campaign_milestone_unlocked", [I18n.translate(milestone_key)])
-		if campaign_active and campaign_current_index == 0:
-			if CAMPAIGN_OPENING.record_first_result(campaign_story, player_won) and player_won:
-				campaign_economy.silver += 5
-				campaign_message += "\nChłop daje ci dodatkowe 5 srebra."
-			campaign_progress = CAMPAIGN_CATALOG.advance(campaign_progress, 0)
 		match_recorded = true
 		_save_progress()
 		
@@ -1324,45 +1340,21 @@ func _show_winner(player_won: bool) -> void:
 	box.add_child(_label(I18n.translate("victory") if player_won else I18n.translate("game_over"), 38, GOLD, HORIZONTAL_ALIGNMENT_CENTER))
 	box.add_child(_label(I18n.translate("player_wins_match", [player_name]) if player_won else I18n.translate("bot_wins_match_dynamic", [bot_name]), 20, CREAM, HORIZONTAL_ALIGNMENT_CENTER))
 	box.add_child(_label(I18n.translate("match_score_dynamic", [player_name, player_score, bot_score, bot_name]), 24, PALE_GOLD, HORIZONTAL_ALIGNMENT_CENTER))
-	if campaign_active:
-		var story_result := campaign_message if player_won else "Turniej trwa dalej. Możesz przejść do następnego przeciwnika." if campaign_current_index == 0 else I18n.translate("campaign_chapter_defeat")
-		if not wager_message.is_empty():
-			story_result += "\n" + wager_message
-		var story_label := _label(story_result, 15, Color("#d8c58f"), HORIZONTAL_ALIGNMENT_CENTER)
-		story_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		story_label.custom_minimum_size = Vector2(450, 48)
-		box.add_child(story_label)
-	
 	if not unlock_message.is_empty():
 		box.add_child(_label(unlock_message, 17, Color("#acd58c"), HORIZONTAL_ALIGNMENT_CENTER))
 	
-	var again_text := I18n.translate("continue_campaign") if campaign_active and (player_won or campaign_current_index == 0) else I18n.translate("retry_chapter") if campaign_active else I18n.translate("rematch")
-	var again := _button(again_text, GREEN, 240)
+	var again := _button(I18n.translate("rematch"), GREEN, 240)
 	again.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	if campaign_active and (player_won or campaign_current_index == 0):
-		again.pressed.connect(_show_campaign_screen)
-	elif campaign_active:
-		again.pressed.connect(_offer_campaign_chapter.bind(campaign_current_index))
-	else:
-		again.pressed.connect(start_game)
+	again.pressed.connect(start_game)
 	box.add_child(again)
-	if campaign_active and not player_won:
-		var shop := _button(I18n.translate("campaign_shop"), Color("#79552b"), 240)
-		shop.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-		shop.pressed.connect(func() -> void:
-			_show_campaign_screen()
-			_show_campaign_shop()
-		)
-		box.add_child(shop)
-	
+
 	var menu := _button(I18n.translate("back_to_menu"), Color("#6f5430"), 240)
 	menu.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	menu.pressed.connect(show_main_menu)
 	box.add_child(menu)
-	if campaign_active:
-		_show_campaign_dialogue.call_deferred(campaign_current_index, "victory" if player_won else "defeat")
 
 func _show_campaign_screen() -> void:
+	active_dialogue = null
 	campaign_tutorial = false
 	if campaign_slot < 0:
 		_show_campaign_saves()
@@ -1390,7 +1382,7 @@ func _show_campaign_screen() -> void:
 	var center := CenterContainer.new()
 	margin.add_child(center)
 	var panel := PanelContainer.new()
-	panel.custom_minimum_size = Vector2(900, 675)
+	panel.custom_minimum_size = Vector2(900, 0)
 	panel.add_theme_stylebox_override("panel", _panel_style(Color("#21150fe8"), Color("#b18442"), 3, 18))
 	center.add_child(panel)
 	var outer := MarginContainer.new()
@@ -1398,11 +1390,16 @@ func _show_campaign_screen() -> void:
 	outer.add_theme_constant_override("margin_right", 24)
 	outer.add_theme_constant_override("margin_top", 20)
 	outer.add_theme_constant_override("margin_bottom", 20)
-	panel.add_child(outer)
+	var overview_scroll := ScrollContainer.new()
+	overview_scroll.custom_minimum_size = Vector2(0, clampf(get_viewport_rect().size.y - 50, 320, 675))
+	overview_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	panel.add_child(overview_scroll)
+	outer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	overview_scroll.add_child(outer)
 	var layout := VBoxContainer.new()
 	layout.add_theme_constant_override("separation", 10)
 	outer.add_child(layout)
-	layout.add_child(_label(I18n.translate("campaign_title"), 32, GOLD, HORIZONTAL_ALIGNMENT_CENTER))
+	layout.add_child(_label(STORY_TEXT.text("KRONIKI KOSTEK"), 32, GOLD, HORIZONTAL_ALIGNMENT_CENTER))
 	var saves := _button(I18n.translate("campaign_saves") + " • " + str(campaign_slot + 1), Color("#4b4238"), 300)
 	saves.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	saves.pressed.connect(_show_campaign_saves)
@@ -1414,6 +1411,7 @@ func _show_campaign_screen() -> void:
 	layout.add_child(_label(I18n.translate("campaign_progress", [campaign_progress, CAMPAIGN_CATALOG.CHAPTERS.size()]), 16, PALE_GOLD, HORIZONTAL_ALIGNMENT_CENTER))
 	var shop := _button(I18n.translate("campaign_shop") + " • " + I18n.translate("silver_balance", [campaign_economy.silver]), Color("#79552b"), 380)
 	shop.name = "CampaignShopButton"
+	shop.disabled = bool(campaign_story.get("finished",false))
 	shop.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	shop.pressed.connect(_show_campaign_shop)
 	layout.add_child(shop)
@@ -1425,40 +1423,46 @@ func _show_campaign_screen() -> void:
 	for milestone: Dictionary in CAMPAIGN_CATALOG.MILESTONES:
 		var achieved := campaign_progress >= int(milestone.required)
 		var prefix := "✓ " if achieved else "○ "
-		goals.add_child(_label(prefix + I18n.translate(str(milestone.key)) + " • %d pkt" % int(campaign_story.get("ending_points", {}).get(str(milestone.key).trim_prefix("campaign_goal_"), 0)), 12, Color("#9fd08a") if achieved else MUTED, HORIZONTAL_ALIGNMENT_CENTER))
+		goals.add_child(_label(prefix + I18n.translate(str(milestone.key)) + STORY_TEXT.text(" • %d pkt") % int(campaign_story.get("ending_points", {}).get(str(milestone.key).trim_prefix("campaign_goal_"), 0)), 12, Color("#9fd08a") if achieved else MUTED, HORIZONTAL_ALIGNMENT_CENTER))
 
+	var clean_status := STORY_TEXT.text("Czyste przejście: aktywne") if CHRONICLES.clean_run(campaign_story) else STORY_TEXT.text("Czyste przejście: niedostępne w tym zapisie")
+	layout.add_child(_label(clean_status + STORY_TEXT.text(" • zakupy: %d • zakłady: %d") % [int(campaign_story.get("dice_purchases",0)), int(campaign_story.get("liczba_zakladow",0))], 13, MUTED, HORIZONTAL_ALIGNMENT_CENTER))
+	if not campaign_ending.is_empty():
+		var epilogue := _button(STORY_TEXT.text("CZYTAJ EPILOG — ") + STORY_TEXT.text(str(CHRONICLES.TITLES.get(campaign_ending,campaign_ending))), GREEN, 450)
+		epilogue.pressed.connect(func() -> void: _show_campaign_dialogue(11,"epilogue"))
+		layout.add_child(epilogue)
 	var current_story := _label("", 16, CREAM, HORIZONTAL_ALIGNMENT_CENTER)
 	current_story.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	current_story.custom_minimum_size = Vector2(800, 58)
 	if campaign_progress >= CAMPAIGN_CATALOG.CHAPTERS.size():
 		current_story.text = I18n.translate("campaign_complete_story")
 		if not campaign_ending.is_empty():
-			current_story.text += "\n" + I18n.translate("campaign_ending_%s" % campaign_ending)
+			current_story.text += "\n" + STORY_TEXT.text(str(CHRONICLES.TITLES.get(campaign_ending,campaign_ending)))
 		current_story.add_theme_color_override("font_color", GOLD)
 	else:
 		var next_chapter: Dictionary = CAMPAIGN_CATALOG.chapter(CAMPAIGN_CATALOG.next_index(campaign_progress))
-		current_story.text = "Z biletem od staruszka ruszasz na turniej. Przy pierwszym stoliku czeka na ciebie chłop." if campaign_progress == 0 and campaign_story.get("prologue_done", false) else "Bez grosza i bez śniadania wyruszasz w świat. Rozpocznij pierwszy rozdział, aby zagrać prolog." if campaign_progress == 0 else I18n.translate(str(next_chapter.story_key))
+		current_story.text = STORY_TEXT.text("Z biletem od staruszka ruszasz na turniej. Przy pierwszym stoliku czeka Tomek Brzuch.") if campaign_progress == 0 and campaign_story.get("prologue_done", false) else STORY_TEXT.text("Bez grosza i bez śniadania wyruszasz w świat. Rozpocznij pierwszy rozdział, aby zagrać prolog.") if campaign_progress == 0 else I18n.translate(str(next_chapter.story_key))
+		if campaign_progress == 1:
+			if campaign_story.get("side_wins",[]).size() < 6:
+				current_story.text = STORY_TEXT.text("Na dziedzińcu czeka sześć pobocznych stołów. Wygraj pojedynki, zarób srebro i rusz do gospody Gromka.")
+			elif not CHRONICLES.passed(campaign_story,12):
+				current_story.text = str(CHRONICLES.data(12).narrator)
+		elif campaign_progress == 2 and not CHRONICLES.passed(campaign_story,13):
+			current_story.text = str(CHRONICLES.data(13).narrator)
+		elif campaign_progress == 11 and not CHRONICLES.passed(campaign_story,14):
+			current_story.text = str(CHRONICLES.data(14).narrator)
 	layout.add_child(current_story)
 	layout.add_child(_separator())
 
-	var scroll := ScrollContainer.new()
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	layout.add_child(scroll)
-	var chapter_list := VBoxContainer.new()
-	chapter_list.custom_minimum_size.x = 820
-	chapter_list.add_theme_constant_override("separation", 6)
-	scroll.add_child(chapter_list)
-	for index in range(CAMPAIGN_CATALOG.CHAPTERS.size()):
-		var chapter: Dictionary = CAMPAIGN_CATALOG.chapter(index)
-		var is_complete := CAMPAIGN_CATALOG.completed(index, campaign_progress)
-		var is_available := CAMPAIGN_CATALOG.can_play(index, campaign_progress)
-		var marker := "✓" if is_complete else "▶" if index == campaign_progress else "×"
-		var chapter_text := I18n.translate("campaign_chapter_format", [marker, index + 1, ("Chłop" if index == 0 else I18n.translate(str(chapter.opponent_key))), int(chapter.target)])
-		var chapter_button := _button(chapter_text, Color("#42603a") if is_complete else Color("#79552b"), 800)
-		chapter_button.disabled = not is_available
-		chapter_button.pressed.connect(_offer_campaign_chapter.bind(index))
-		chapter_list.add_child(chapter_button)
+	if not campaign_story.get("finished",false):
+		var next_index := CHRONICLES.next_encounter(campaign_progress,campaign_story)
+		var proceed := _button(I18n.translate("continue_campaign"),GREEN,450)
+		proceed.name = "CampaignContinueButton"
+		proceed.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		proceed.pressed.connect(_continue_campaign)
+		layout.add_child(proceed)
+		var next_label := _label(CHRONICLES.name(int(campaign_checkpoint.get("chapter",next_index))) if next_index >= 0 else STORY_TEXT.text("WYBIERZ ZAKOŃCZENIE"),18,PALE_GOLD,HORIZONTAL_ALIGNMENT_CENTER)
+		layout.add_child(next_label)
 
 	var back := _button(I18n.translate("back_to_menu"), Color("#4b4238"), 240)
 	back.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
@@ -1550,47 +1554,60 @@ func _show_campaign_shop(message: String = "") -> void:
 	layout.add_child(close)
 
 func _buy_campaign_die(type_index: int) -> void:
-	if campaign_active or not campaign_economy.buy(type_index):
+	if campaign_active or campaign_story.get("finished",false) or not campaign_economy.buy(type_index):
 		return
+	campaign_story["dice_purchases"] = int(campaign_story.get("dice_purchases", 0)) + 1
 	campaign_economy.equip(shop_selected_slot, type_index)
 	_save_progress()
 	_play_sfx("coin_bank")
 	_show_campaign_shop(I18n.translate("shop_bought", [DiceCatalog.type_name(type_index), shop_selected_slot + 1]))
 
+func _continue_campaign() -> void:
+	if not campaign_checkpoint.is_empty():
+		var section := str(campaign_checkpoint.get("section",""))
+		if section == "tutorial_match":
+			_begin_campaign_tutorial()
+		else:
+			_show_campaign_dialogue(int(campaign_checkpoint.chapter),section,Callable(),int(campaign_checkpoint.get("line",0)))
+		return
+	if campaign_story.get("finished",false):
+		_show_campaign_screen()
+		return
+	var stage := str(campaign_story.get("pending_ending",""))
+	if not stage.is_empty() or campaign_progress >= 12:
+		_show_campaign_dialogue(7 if stage == "king" else 9 if stage == "emperor" else 11,"coronation")
+		return
+	var next_index := CHRONICLES.next_encounter(campaign_progress,campaign_story)
+	if next_index >= 0:
+		_offer_campaign_chapter(next_index)
+
+
 func _offer_campaign_chapter(index: int) -> void:
+	if not CHRONICLES.can_enter(index, campaign_progress, campaign_story):
+		return
+	campaign_checkpoint.clear()
+	if index == 1 and campaign_story.get("przegral_z_cieniem",false) and not campaign_story.get("pieczec",false):
+		_show_campaign_dialogue(index,"seal")
+		return
 	if index == 0 and not bool(campaign_story.get("prologue_done", campaign_progress > 0)):
 		_show_campaign_dialogue(0, "prologue", _begin_campaign_tutorial)
 		return
-	if not CAMPAIGN_CATALOG.can_play(index, campaign_progress):
-		return
-	if CAMPAIGN_CATALOG.wager_limit(index) <= 0:
-		_start_campaign_chapter(index)
-		return
-	var dialogue := VISUAL_NOVEL_DIALOGUE_SCENE.instantiate() as Control
-	dialogue.name = "CampaignWager"
-	dialogue.set_meta("wager_index", index)
-	screen_layer.add_child(dialogue)
-	active_dialogue = dialogue
-	dialogue.finished.connect(func() -> void:
-		var result := str(dialogue.get("result_id"))
-		active_dialogue = null
-		dialogue.queue_free()
-		if result.begins_with("wager_"):
-			_start_campaign_chapter(index, int(result.trim_prefix("wager_")))
-	, CONNECT_ONE_SHOT)
-	dialogue.call("play", WAGER_DIALOGUE.build(index, campaign_economy.silver, I18n.translate))
+	_start_campaign_chapter(index)
 
-func _start_campaign_chapter(index: int, wager: int = 0) -> void:
-	if not CAMPAIGN_CATALOG.can_play(index, campaign_progress):
+func _start_campaign_chapter(index: int, _wager: int = 0) -> void:
+	if not CHRONICLES.can_enter(index, campaign_progress, campaign_story):
 		return
 	_capture_quick_match_settings()
-	campaign_checkpoint = {"wager": wager}
-	_show_campaign_dialogue(index, "intro", _begin_campaign_match.bind(index, wager))
+	_show_campaign_dialogue(index, "intro")
 
 func _begin_campaign_match(index: int, wager: int = 0) -> void:
-	if not CAMPAIGN_CATALOG.can_play(index, campaign_progress) or not campaign_economy.place_wager(index, wager):
+	if not CHRONICLES.can_enter(index, campaign_progress, campaign_story) or not campaign_economy.place_wager(index, wager):
 		_show_campaign_screen()
 		return
+	CHRONICLES.record_wager(campaign_story, wager)
+	if index == 12 and wager == 0:
+		CHRONICLES.points_once(campaign_story, "gromek_honor", [0,1,0,0])
+	campaign_checkpoint.clear()
 	var chapter: Dictionary = CAMPAIGN_CATALOG.chapter(index)
 	_capture_quick_match_settings()
 	player_loadout.assign(campaign_economy.loadout)
@@ -1598,31 +1615,30 @@ func _begin_campaign_match(index: int, wager: int = 0) -> void:
 	campaign_current_index = index
 	bot_profile_id = str(chapter.profile)
 	bot_difficulty = str(chapter.difficulty)
-	bot_name = "Chłop" if index == 0 else I18n.translate(str(chapter.opponent_key))
+	bot_name = CHRONICLES.name(index)
 	theme_id = str(chapter.theme)
 	target_score = int(chapter.target)
 	_save_progress()
 	start_game()
 
 func _show_campaign_dialogue(index: int, section: String, after_dialogue: Callable = Callable(), start_line: int = 0) -> void:
-	var chapter: Dictionary = CAMPAIGN_CATALOG.chapter(index)
-	var dialogue_path := str(chapter.get("dialogue", ""))
-	var dialogue_resource := CAMPAIGN_OPENING.build(section) if index == 0 else load(dialogue_path) as Resource if not dialogue_path.is_empty() else null
-	if dialogue_resource == null:
-		if after_dialogue.is_valid():
-			after_dialogue.call()
-		return
+	if is_instance_valid(active_dialogue):
+		active_dialogue.queue_free()
+	var context: Dictionary = campaign_story.duplicate(true)
+	context["silver"] = campaign_economy.silver
+	if campaign_checkpoint.get("chapter",-1) == index and campaign_checkpoint.get("section","") == section and campaign_checkpoint.has("context"):
+		context = campaign_checkpoint.context.duplicate(true)
+	var resource := _chronicle_resource(index, section, context)
 	var dialogue := VISUAL_NOVEL_DIALOGUE_SCENE.instantiate() as Control
 	screen_layer.add_child(dialogue)
 	active_dialogue = dialogue
 	dialogue.set("story_gender", str(campaign_story.get("gender", "male")))
 	dialogue.line_changed.connect(func(line_index: int) -> void:
-		campaign_checkpoint = {"chapter": index, "section": section, "line": line_index, "wager": int(campaign_checkpoint.get("wager", 0))}
+		campaign_checkpoint = {"chapter": index, "section": section, "line": line_index, "context": context}
 		_save_progress()
 	)
 	dialogue.choice_selected.connect(func(choice_id: String) -> void:
-		if choice_id in ["male", "female"]:
-			campaign_story["gender"] = choice_id
+		_apply_chronicle_choice(index, section, choice_id, context)
 		campaign_choices.append({"chapter": index, "section": section, "choice": choice_id})
 		_save_progress()
 	)
@@ -1631,18 +1647,23 @@ func _show_campaign_dialogue(index: int, section: String, after_dialogue: Callab
 	copy_save.position = Vector2(24, 78)
 	copy_save.pressed.connect(_show_campaign_saves.bind(true))
 	dialogue.add_child(copy_save)
+	var pause := _button(I18n.translate("campaign_pause"),Color("#4b4238"),230)
+	pause.name = "CampaignPause"
+	pause.position = Vector2(270,78)
+	pause.pressed.connect(_show_campaign_screen)
+	dialogue.add_child(pause)
 	dialogue.finished.connect(func() -> void:
-		var chosen_ending := str(dialogue.get("result_id"))
-		if not chosen_ending.is_empty():
-			campaign_ending = chosen_ending
+		var result := str(dialogue.get("result_id"))
 		campaign_checkpoint.clear()
-		_save_progress()
 		active_dialogue = null
 		dialogue.queue_free()
+		_save_progress()
 		if after_dialogue.is_valid():
 			after_dialogue.call()
+		else:
+			_after_chronicle_dialogue(index, section, result)
 	, CONNECT_ONE_SHOT)
-	dialogue.call("play", dialogue_resource, section, start_line)
+	dialogue.call("play", resource, "intro", start_line)
 
 func _campaign_config() -> ConfigFile:
 	var config := ConfigFile.new()
@@ -1658,15 +1679,25 @@ func _campaign_config() -> ConfigFile:
 func _apply_campaign_config(config: ConfigFile) -> void:
 	campaign_tutorial = false
 	var saved_story: Variant = config.get_value("campaign", "story", {})
+	var legacy_story: bool = not saved_story is Dictionary or int(saved_story.get("chronicles_version",0)) < 2
 	campaign_story = saved_story.duplicate(true) if saved_story is Dictionary else {}
 	campaign_progress = CAMPAIGN_CATALOG.clamped_progress(int(config.get_value("campaign", "progress", 0)))
 	campaign_ending = str(config.get_value("campaign", "ending", ""))
+	CHRONICLES.initialize(campaign_story, campaign_progress, config.has_section("campaign"))
+	if not campaign_ending.is_empty():
+		campaign_story["finished"] = true
 	campaign_economy = CAMPAIGN_ECONOMY.new()
 	campaign_economy.read_save(config, campaign_progress)
 	var choices: Variant = config.get_value("campaign", "choices", [])
 	campaign_choices = choices.duplicate(true) if choices is Array else []
 	var checkpoint: Variant = config.get_value("campaign", "checkpoint", {})
 	campaign_checkpoint = checkpoint.duplicate(true) if checkpoint is Dictionary else {}
+	if legacy_story:
+		if campaign_checkpoint.get("section", "") != "tutorial_match":
+			campaign_checkpoint.clear()
+		for event in campaign_choices:
+			if event is Dictionary and CHRONICLES.REASONS.has(str(event.get("choice",""))):
+				campaign_story["powod"] = CHRONICLES.REASONS[str(event.choice)]
 	player_name = str(config.get_value("campaign", "name", player_name))
 
 func _activate_campaign_slot(slot: int) -> void:
@@ -1687,12 +1718,12 @@ func _activate_campaign_slot(slot: int) -> void:
 		var index := int(campaign_checkpoint.get("chapter", -1))
 		var section := str(campaign_checkpoint.get("section", ""))
 		var line := maxi(0, int(campaign_checkpoint.get("line", 0)))
-		if CAMPAIGN_CATALOG.can_play(index, campaign_progress) and section in ["intro", "victory", "defeat", "prologue", "tutorial_victory", "tutorial_defeat", "tutorial_match"]:
-			if section == "tutorial_match":
-				_begin_campaign_tutorial()
-				return
-			var after := _begin_campaign_tutorial if section == "prologue" else _begin_campaign_match.bind(index, int(campaign_checkpoint.get("wager", 0))) if section == "intro" else _show_campaign_screen
-			_show_campaign_dialogue(index, section, after, line)
+		if section == "tutorial_match":
+			_begin_campaign_tutorial()
+		elif not CAMPAIGN_CATALOG.chapter(index).is_empty() and section in ["intro", "victory", "defeat", "prologue", "tutorial_victory", "tutorial_defeat", "wager", "wager_reply", "seal", "seal_route", "coronation", "epilogue"]:
+			_show_campaign_dialogue(index, section, Callable(), line)
+	elif not str(campaign_story.get("pending_ending", "")).is_empty():
+		_show_campaign_dialogue(11 if campaign_story.pending_ending == "final" else 7 if campaign_story.pending_ending == "king" else 9, "coronation")
 
 func _copy_campaign_slot(slot: int) -> bool:
 	if slot < 0 or slot >= CAMPAIGN_SAVES.SLOT_COUNT or FileAccess.file_exists(CAMPAIGN_SAVES.path(slot)):
@@ -1775,7 +1806,7 @@ func _show_campaign_saves(copy_only: bool = false) -> void:
 		if config != null:
 			var ending := str(config.get_value("campaign", "ending", ""))
 			description = I18n.translate("save_summary", [slot + 1, int(config.get_value("campaign", "progress", 0)), int(config.get_value("campaign", "silver", 0))])
-			description += "\n" + (I18n.translate("campaign_goal_" + ending) if not ending.is_empty() else str(config.get_value("campaign", "updated", "")))
+			description += "\n" + (STORY_TEXT.text(str(CHRONICLES.TITLES.get(ending,ending))) if not ending.is_empty() else str(config.get_value("campaign", "updated", "")))
 		elif exists:
 			description = I18n.translate("save_unreadable", [slot + 1])
 		var label := _label(description, 14, CREAM)
@@ -1848,7 +1879,7 @@ func _show_multiplayer_lobby() -> void:
 	shade.add_child(center)
 	
 	var panel := PanelContainer.new()
-	panel.custom_minimum_size = Vector2(760, 680)
+	panel.custom_minimum_size = Vector2(760, 0)
 	panel.add_theme_stylebox_override("panel", _panel_style(Color("#281912"), Color("#977241"), 3, 16))
 	center.add_child(panel)
 	
@@ -1857,7 +1888,12 @@ func _show_multiplayer_lobby() -> void:
 	margin.add_theme_constant_override("margin_top", 24)
 	margin.add_theme_constant_override("margin_right", 24)
 	margin.add_theme_constant_override("margin_bottom", 24)
-	panel.add_child(margin)
+	var scroll := ScrollContainer.new()
+	scroll.custom_minimum_size = Vector2(0, clampf(get_viewport_rect().size.y - 48, 320, 680))
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	panel.add_child(scroll)
+	margin.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.add_child(margin)
 	
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 12)
@@ -1909,6 +1945,30 @@ func _show_multiplayer_lobby() -> void:
 	var public_display := _label("", 13, GOLD, HORIZONTAL_ALIGNMENT_CENTER)
 	public_display.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(public_display)
+	var copy_code := _button(I18n.translate("copy_room_code"), Color("#6f5430"), 190)
+	copy_code.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	copy_code.pressed.connect(func() -> void:
+		if not network_session.public_address.is_empty():
+			DisplayServer.clipboard_set(NetworkSession.make_room_code(network_session.public_address))
+	)
+	var invitation_buttons := HBoxContainer.new()
+	invitation_buttons.alignment = BoxContainer.ALIGNMENT_CENTER
+	box.add_child(invitation_buttons)
+	invitation_buttons.add_child(copy_code)
+	var copy_link := _button(I18n.translate("copy_invite_link"), Color("#6f5430"), 190)
+	copy_link.pressed.connect(func() -> void:
+		if not network_session.public_address.is_empty():
+			DisplayServer.clipboard_set(INVITE_LINKS.make_link(network_session.public_address))
+	)
+	invitation_buttons.add_child(copy_link)
+	var enable_links := _button(I18n.translate("enable_invite_links"), Color("#6f5430"), 230)
+	enable_links.tooltip_text = I18n.translate("enable_invite_links_hint")
+	enable_links.pressed.connect(func() -> void:
+		network_status_label.text = INVITE_LINKS.register_handler()
+	)
+	invitation_buttons.add_child(enable_links)
+	copy_code.disabled = network_session.public_address.is_empty()
+	copy_link.disabled = copy_code.disabled
 	box.add_child(_separator())
 	
 	var join_row := HBoxContainer.new()
@@ -1918,7 +1978,7 @@ func _show_multiplayer_lobby() -> void:
 	
 	var address_edit := LineEdit.new()
 	address_edit.placeholder_text = I18n.translate("address_placeholder")
-	address_edit.text = "127.0.0.1"
+	address_edit.text = ""
 	address_edit.custom_minimum_size = Vector2(410, 42)
 	address_edit.add_theme_font_size_override("font_size", 15)
 	join_row.add_child(address_edit)
@@ -1976,12 +2036,14 @@ func _show_multiplayer_lobby() -> void:
 	)
 	
 	set_public_btn.pressed.connect(func() -> void:
-		network_session.set_public_address(public_edit.text)
+		network_session.set_public_address(public_edit.text, clampi(port_edit.text.to_int(), 1024, 65535))
 	)
 	
 	var on_public_ready := func(addr: String) -> void:
-		public_display.text = I18n.translate("send_to_friends", [addr])
-	network_session.public_address_ready.connect(on_public_ready, CONNECT_ONE_SHOT)
+		public_display.text = I18n.translate("send_to_friends", [NetworkSession.make_room_code(addr)])
+		copy_code.disabled = false
+		copy_link.disabled = false
+	network_session.public_address_ready.connect(on_public_ready)
 	
 	join_button.pressed.connect(func() -> void:
 		var port := clampi(port_edit.text.to_int(), 1024, 65535)
@@ -2009,12 +2071,14 @@ func _show_multiplayer_lobby() -> void:
 	box.add_child(back)
 
 func _render_dice(locked: bool) -> void:
+	keyboard_die = clampi(keyboard_die, 0, maxi(0, current_dice.size() - 1))
 	_clear_dice_row()
 	for index in range(current_dice.size()):
 		var die := DieView.new()
 		var die_type := current_roll_types[index] if index < current_roll_types.size() else 0
 		die.configure(index, current_dice[index], die_type, locked)
 		die.tooltip_text = DiceCatalog.type_name(die_type)
+		die.keyboard_cursor = index == keyboard_die
 		die.die_pressed.connect(_on_die_pressed)
 		dice_row.add_child(die)
 		die.custom_minimum_size = Vector2(70, 70)
@@ -2045,8 +2109,8 @@ func _dice_text(values: Array) -> String:
 
 func _update_game_ui() -> void:
 	if is_instance_valid(player_score_label):
-		player_score_label.text = "%d pkt" % player_score
-		bot_score_label.text = "%d pkt" % bot_score
+		player_score_label.text = STORY_TEXT.text("%d pkt") % player_score
+		bot_score_label.text = STORY_TEXT.text("%d pkt") % bot_score
 		player_progress.value = player_score
 		bot_progress.value = bot_score
 		turn_label.text = I18n.translate("turn_points", [turn_score])
@@ -2249,6 +2313,7 @@ func _load_progress() -> void:
 		sound_pack_id = AssetLibrary.set_sound_pack(sound_pack_id)
 	campaign_slot = clampi(int(config.get_value("campaign", "active_slot", 0)), -1, CAMPAIGN_SAVES.SLOT_COUNT - 1)
 	if not config.has_section_key("campaign", "active_slot") and config.has_section("campaign") and not FileAccess.file_exists(CAMPAIGN_SAVES.path(0)):
+		CHRONICLES.initialize(campaign_story, campaign_progress, true)
 		CAMPAIGN_SAVES.write_slot(0, _campaign_config())
 	var slot_config := CAMPAIGN_SAVES.read_slot(campaign_slot)
 	if slot_config != null:
@@ -2333,7 +2398,16 @@ func _refresh_language() -> void:
 			var resource := WAGER_DIALOGUE.build(int(active_dialogue.get_meta("wager_index")), campaign_economy.silver, I18n.translate)
 			active_dialogue.call("play", resource, "intro", int(active_dialogue.get("_line_index")))
 		else:
-			active_dialogue.call("refresh_language")
+			if not campaign_checkpoint.is_empty():
+				var context: Dictionary = campaign_checkpoint.get("context",campaign_story).duplicate(true)
+				context["silver"] = context.get("silver",campaign_economy.silver)
+				var resource := _chronicle_resource(int(campaign_checkpoint.chapter),str(campaign_checkpoint.section),context)
+				active_dialogue.call("play",resource,"intro",int(active_dialogue.get("_line_index")))
+			else:
+				active_dialogue.call("refresh_language")
+			var pause := active_dialogue.get_node_or_null("CampaignPause") as Button
+			if pause != null:
+				pause.text = I18n.translate("campaign_pause")
 			var branch := active_dialogue.get_node_or_null("SaveBranch") as Button
 			if branch != null:
 				branch.text = I18n.translate("save_branch")
@@ -2347,6 +2421,7 @@ func _refresh_language() -> void:
 		"setup": _show_setup_menu(setup_mode)
 		"campaign": _show_campaign_screen()
 		"saves": _show_campaign_saves()
+		"achievements": _show_achievements()
 		"game": _update_game_ui()
 
 func _ensure_audio_buses() -> void:
@@ -2501,6 +2576,8 @@ func _show_rules() -> void:
 	dialog.confirmed.connect(dialog.queue_free)
 
 func _on_network_status_changed(msg: String) -> void:
+	if is_instance_valid(developer_console) and developer_console.unlocked:
+		developer_console.log_line(msg)
 	if is_instance_valid(network_status_label):
 		network_status_label.text = msg
 
@@ -2537,6 +2614,7 @@ func _on_network_match_started(config: Dictionary) -> void:
 	_clear_screen()
 	
 	multiplayer_table = MultiplayerTable.new()
+	multiplayer_table.developer_console = developer_console
 	multiplayer_table.configure(network_session, tavern_world, config)
 	multiplayer_table.leave_requested.connect(show_main_menu)
 	multiplayer_table.sfx_requested.connect(_play_sfx)
@@ -2582,7 +2660,7 @@ func _populate_option_button(button: OptionButton, entries: Array, selected_id: 
 	for index in range(entries.size()):
 		var entry := entries[index] as Dictionary
 		var label_text := I18n.translate(str(entry.label_key)) if entry.has("label_key") else str(entry.get("label", entry.get("id", "")))
-		if label_text == "Domyślna postać" or label_text == "Default character":
+		if label_text == STORY_TEXT.text("Domyślna postać") or label_text == "Default character":
 			label_text = I18n.translate("default_character")
 		button.add_item(label_text if not label_text.is_empty() else I18n.translate("option"))
 		button.set_item_metadata(index, str(entry.get("id", "")))
@@ -2619,14 +2697,306 @@ func _begin_campaign_tutorial() -> void:
 	player_loadout.assign([1, 1, 1, 1, 1, 1])
 	bot_profile_id = "rookie"
 	bot_difficulty = "easy"
-	bot_name = "Staruszek"
+	bot_name = STORY_TEXT.text("Staruszek")
 	theme_id = "forest"
 	target_score = 500
 	_save_progress()
 	start_game()
-	var help := _label("Staruszek: wybierz punktujące kości (1 = 100, 5 = 50, trójki).\nBankuj, by zachować punkty, lub rzuć pozostałymi. Farkle zabiera punkty tury. Cel: 500.", 14, CREAM, HORIZONTAL_ALIGNMENT_CENTER)
+	var help := _label(STORY_TEXT.text("Staruszek: wybierz punktujące kości (1 = 100, 5 = 50, trójki).\nBankuj, by zachować punkty, lub rzuć pozostałymi. Farkle zabiera punkty tury. Cel: 500."), 14, CREAM, HORIZONTAL_ALIGNMENT_CENTER)
 	help.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
 	help.position = Vector2(180, 80)
 	help.size.x = 850
 	help.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	screen_layer.add_child(help)
+
+
+func console_finish_match(player_won: bool) -> String:
+	if current_menu == "network" and is_instance_valid(multiplayer_table):
+		return multiplayer_table.console_finish_match(player_won)
+	if current_menu != "game" or match_recorded:
+		return STORY_TEXT.text("Brak aktywnego meczu.")
+	if campaign_active:
+		campaign_story["console_used"] = true
+	if player_won:
+		player_score = target_score
+	else:
+		bot_score = target_score
+	dice_rolled = false
+	_update_game_ui()
+	_show_winner(player_won)
+	return STORY_TEXT.text("Wygrana.") if player_won else STORY_TEXT.text("Przegrana.")
+
+
+func _join_invitation(invitation: String) -> void:
+	var endpoint := NetworkSession.parse_endpoint(invitation)
+	show_main_menu()
+	_show_multiplayer_lobby()
+	if not endpoint.valid:
+		network_status_label.text = str(endpoint.error)
+		return
+	network_session.join_game(invitation, player_name, NetworkSession.DEFAULT_PORT, player_loadout, player_avatar_id)
+
+
+func _chronicle_resource(index: int, section: String, context: Dictionary) -> Resource:
+	if section in ["prologue", "tutorial_victory", "tutorial_defeat"]:
+		var sequence := CAMPAIGN_OPENING.build(section)
+		if section == "prologue":
+			var memory := _mother_memory()
+			if not memory.is_empty():
+				sequence.lines[2].text = memory + "\n" + sequence.lines[2].text
+		return sequence
+	if section == "epilogue":
+		return CHRONICLES.epilogue(campaign_ending, context)
+	if section in ["intro", "victory", "defeat"]:
+		var sequence := CHRONICLES.build(index,section,context)
+		if section in ["victory","defeat"]:
+			var summary := STORY_TEXT.text("Nagroda: %d srebra. Sakiewka: %d.") % [int(context.get("last_reward",0)),int(context.get("silver",0))]
+			if int(context.get("last_wager",0)) > 0:
+				summary += STORY_TEXT.text(" Zwrot zakładu: %d (stawka: %d).") % [int(context.get("last_payout",0)),int(context.get("last_wager",0))]
+			sequence.lines.append(CAMPAIGN_OPENING.line(summary))
+		return sequence
+	var sequence := DialogueSequence.new()
+	sequence.title = STORY_TEXT.text("Kroniki Kostek — ") + CHRONICLES.name(index)
+	var words := STORY_TEXT.text("Stawka czy czysta gra? Masz %d srebra.") % int(context.get("silver",0))
+	if section == "seal":
+		words = STORY_TEXT.text("Nie masz pięciuset. Masz brudne sto pięćdziesiąt i głodne oczy. Lubię to. Za tyle oddam pieczęć.") if int(context.get("silver",0)) >= 150 else STORY_TEXT.text("Nie zawracaj mi dupy, jak nie masz pieniędzy, [gołodupcu|gołodupico]. Albo grasz, albo idziesz do domu bez biletu na dwór.")
+	elif section == "seal_route":
+		words = STORY_TEXT.text("Trzymaj pieczęć. Miło było robić z tobą interesy. Możesz ruszyć dalej albo zostać przy stole i zagrać o honor.")
+	elif section == "coronation":
+		words = STORY_TEXT.text("Wybierz, kim jesteś, gdy kości milczą.") if index == 11 else STORY_TEXT.text("Możesz zakończyć tę kronikę albo ruszyć dalej. Korona nie musi być ostatnim stołem.")
+	elif section == "wager_reply":
+		words = STORY_TEXT.text("Stawka przyjęta. Siadaj, kości czekają.")
+		if index == 1:
+			words = STORY_TEXT.text("Hazard. Pachniesz mi cesarzem albo trupem. Lubię oba zapachy.")
+		elif index == 4:
+			words = STORY_TEXT.text("Hazard przy kluczu do wieży! Król by zemdlał. Dlatego stawiam.")
+		elif index == 8 and int(context.get("pending_wager",0)) >= 500:
+			words = STORY_TEXT.text("Pięćset. To już nie gra, to wojna w srebrze. Dobrze.")
+	elif index == 12:
+		words = STORY_TEXT.text("Gram o gulasz i 20 srebra albo o honor kotła. Możesz też ruszyć dalej.")
+	var line := CAMPAIGN_OPENING.line(words,CHRONICLES.name(index))
+	line.portrait_id = CAMPAIGN_CATALOG.chapter(index).get("avatar","procedural")
+	line.portrait_side = "left"
+	line.backdrop = CAMPAIGN_CATALOG.chapter(index).get("theme","tavern")
+	for item in _chronicle_actions(index,section,context):
+		var choice := CAMPAIGN_OPENING.choice(str(item.id),str(item.text))
+		choice.ending_id = str(item.id)
+		line.choices.append(choice)
+	sequence.lines.append(line)
+	return sequence
+
+func _chronicle_actions(index: int, section: String, context: Dictionary) -> Array:
+	var choices: Array = []
+	if section == "seal":
+		if int(context.get("silver",0)) >= 150:
+			choices.append({"id":"buy_seal","text":STORY_TEXT.text("Zapłacę 150 srebra. Oddaj pieczęć."),"points":[0,-1,2,0],"flags":{"pieczec":true,"brudne_rece":true,"pomogl_zlodziejowi":true,"bought_seal":true},"silver":-150})
+		choices.append({"id":"play","text":STORY_TEXT.text("Zagram o pieczęć."),"points":[0,0,0,1] if int(context.get("silver",0)) < 150 else [0,0,0,0]})
+		choices.append({"id":"leave","text":STORY_TEXT.text("Wrócę później.")})
+	elif section == "seal_route":
+		choices = [{"id":"skip","text":STORY_TEXT.text("Pieczęć mam. Ruszam dalej.")},{"id":"play","text":STORY_TEXT.text("Zostanę. Zagram o honor.")}]
+	elif section == "wager":
+		var limit := mini(CAMPAIGN_CATALOG.wager_limit(index),int(context.get("silver",0)))
+		if limit > 0:
+			for amount in [mini(25,limit),limit]:
+				var id := "wager_%d" % amount
+				if choices.is_empty() or choices[0].id != id:
+					choices.append({"id":id,"text":STORY_TEXT.text("Stawiam %d srebra. Wygrana: zwrot %d.") % [amount,amount * 2]})
+		choices.append({"id":"wager_0","text":STORY_TEXT.text("Gram o honor kotła.") if index == 12 else STORY_TEXT.text("Gram bez stawki.")})
+		choices.append({"id":"leave","text":STORY_TEXT.text("Może innym razem. Ruszam dalej.") if index == 12 else STORY_TEXT.text("Odejdę. Wrócę do stołu później.")})
+	elif section == "coronation":
+		var stage := "king" if index == 7 else "emperor" if index == 9 else "final"
+		var descriptions := {"princess":STORY_TEXT.text("Koronę weźmie Elara. Ja wezmę fotel, miskę i zakaz budzenia przed południem."),"king":STORY_TEXT.text("Zostać [królem|królową]. Uczciwie, pracowicie, bez trupów na schodach."),"emperor":STORY_TEXT.text("Objąć cesarski tron. Cel uświęcił stół."),"world_champion":STORY_TEXT.text("Odrzucić tron. Iść od stołu do stołu. Nie przegrać."),"shadow":STORY_TEXT.text("Zejść z galerii. Teraz.")}
+		for ending in CHRONICLES.endings(context,stage):
+			choices.append({"id":"ending:" + ending,"text":descriptions[ending]})
+		if stage != "final":
+			choices.append({"id":"continue","text":STORY_TEXT.text("Korona to dopiero początek.") if stage == "king" else STORY_TEXT.text("To wciąż nie ten stół."),"points":[0,0,1,1] if stage == "king" else [0,0,0,2]})
+			if stage == "king" and context.get("sojusz_vespera",false):
+				choices.append({"id":"continue_shadow","text":STORY_TEXT.text("Koronę włożę. Cienie zostawię pod nią."),"points":[0,-1,1,0]})
+	return choices
+
+func _mother_memory() -> String:
+	return {"kradziez":STORY_TEXT.text("Matylda: «W domu nie kradnie się od swoich.»"), "pobicie":STORY_TEXT.text("Matylda: «Pięściami nie naprawisz głodu. Wynocha.»"), "lenistwo":STORY_TEXT.text("Matylda: «Do południa chrapiesz, a kasza sama się nie ugotuje.»"), "obzarstwo":STORY_TEXT.text("Matylda: «Spiżarnia to nie twoja żona. Won.»"), "chciwosc":STORY_TEXT.text("Matylda: «[Liczyłeś|Liczyłaś] moje grosze głośniej niż pacierz.»")}.get(campaign_story.get("powod",""),"")
+
+func _apply_chronicle_choice(index: int, section: String, id: String, context: Dictionary) -> void:
+	if section == "prologue":
+		if id in ["male","female"]:
+			campaign_story["gender"] = id
+		elif CHRONICLES.REASONS.has(id):
+			if CHRONICLES.points_once(campaign_story,"prologue_reason",CHRONICLES.REASON_POINTS[id]):
+				campaign_story["powod"] = CHRONICLES.REASONS[id]
+			if is_instance_valid(active_dialogue):
+				var line: Resource = active_dialogue.sequence.lines[2]
+				line.text = _mother_memory() + "\n" + CAMPAIGN_OPENING.build("prologue").lines[2].text
+		return
+	var item := CHRONICLES.option(context,index,section,id) if section in ["intro","victory"] else {}
+	if item.is_empty():
+		for action in _chronicle_actions(index,section,context):
+			if action.id == id:
+				item = action
+				break
+	if item.is_empty() or section in ["wager","seal_route"] or id.begins_with("ending:") or id == "leave":
+		return
+	if id == "buy_seal":
+		if campaign_story.get("bought_seal",false) or campaign_economy.silver < 150:
+			return
+		if CHRONICLES.points_once(campaign_story,"seal_purchase",[0,-1,2,0]):
+			campaign_economy.silver -= 150
+			campaign_story.merge({"pieczec":true,"brudne_rece":true,"pomogl_zlodziejowi":true,"bought_seal":true},true)
+		return
+	campaign_economy.silver += CHRONICLES.apply_choice(campaign_story,index,section,item)
+
+func _after_chronicle_dialogue(index: int, section: String, result: String) -> void:
+	match section:
+		"prologue": _begin_campaign_tutorial()
+		"tutorial_victory", "tutorial_defeat": _continue_campaign()
+		"epilogue": _show_campaign_screen()
+		"intro":
+			if index == 1 and campaign_story.get("cien_rozmowa","") == "targ" and not campaign_story.get("bought_seal",false):
+				_show_campaign_dialogue(index,"seal")
+			elif index == 1 and campaign_story.get("bought_seal",false):
+				_show_campaign_dialogue(index,"seal_route")
+			elif CAMPAIGN_CATALOG.wager_limit(index) > 0:
+				_show_campaign_dialogue(index,"wager")
+			else:
+				_begin_campaign_match(index)
+		"seal":
+			if result == "buy_seal" and campaign_story.get("bought_seal",false):
+				_show_campaign_dialogue(index,"seal_route")
+			elif result == "play":
+				_show_campaign_dialogue(index,"wager")
+			else:
+				_show_campaign_screen()
+		"seal_route":
+			if result == "skip" and campaign_story.get("pieczec",false):
+				campaign_progress = CAMPAIGN_CATALOG.advance(campaign_progress,1)
+				campaign_story.passed["1"] = true
+				_save_progress()
+				_continue_campaign()
+			else:
+				_show_campaign_dialogue(index,"wager")
+		"wager":
+			if result.begins_with("wager_"):
+				var amount := int(result.trim_prefix("wager_"))
+				if amount > 0:
+					campaign_story["pending_wager"] = amount
+					_show_campaign_dialogue(index,"wager_reply")
+				else:
+					_begin_campaign_match(index)
+			else:
+				if index == 12:
+					campaign_story.passed["12"] = true
+					CHRONICLES.points_once(campaign_story,"gromek_leave",[1,0,-1,-1])
+					_save_progress()
+					_continue_campaign()
+				else:
+					_show_campaign_screen()
+		"wager_reply":
+			var amount := int(campaign_story.get("pending_wager",0))
+			campaign_story.erase("pending_wager")
+			_begin_campaign_match(index,amount)
+		"victory", "defeat":
+			if section == "victory" and index in [7,9,11] and not campaign_story.get("finished",false):
+				campaign_story["pending_ending"] = "king" if index == 7 else "emperor" if index == 9 else "final"
+				_save_progress()
+				_show_campaign_dialogue(index,"coronation")
+			else:
+				_continue_campaign()
+		"coronation":
+			if result.begins_with("ending:"):
+				var ending := result.trim_prefix("ending:")
+				var stage := "king" if index == 7 else "emperor" if index == 9 else "final"
+				if ending in CHRONICLES.endings(campaign_story,stage):
+					campaign_ending = ending
+					campaign_story["finished"] = true
+					campaign_story.erase("pending_ending")
+					_check_achievements()
+					_save_progress()
+					_show_campaign_dialogue(index,"epilogue")
+			else:
+				campaign_story.erase("pending_ending")
+				_save_progress()
+				_continue_campaign()
+
+func _finish_chronicles_match(won: bool) -> void:
+	if match_recorded:
+		return
+	match_recorded = true
+	game_token += 1
+	dice_rolled = false
+	if campaign_tutorial:
+		campaign_tutorial = false
+		campaign_story.merge({"prologue_done":true,"porridge":true,"ticket":true},true)
+		CHRONICLES.points_once(campaign_story,"tutorial",[0,0,1,1] if won else [1,0,0,0])
+		campaign_checkpoint.clear()
+		_show_campaign_dialogue(0,"tutorial_victory" if won else "tutorial_defeat")
+		return
+	matches_played += 1
+	if won:
+		matches_won += 1
+		_commit_winning_player_learning()
+	var wager := campaign_economy.active_wager
+	var payout := campaign_economy.settle_wager(won)
+	var outcome := CHRONICLES.record_result(campaign_story,campaign_current_index,won)
+	campaign_economy.silver += int(outcome.reward)
+	if outcome.advance and campaign_current_index < 12:
+		campaign_progress = CAMPAIGN_CATALOG.advance(campaign_progress,campaign_current_index)
+	campaign_story["last_reward"] = int(outcome.reward)
+	campaign_story["last_payout"] = payout
+	campaign_story["last_wager"] = wager
+	_check_achievements()
+	campaign_checkpoint.clear()
+	_save_progress()
+	_show_campaign_dialogue(campaign_current_index,"victory" if won else "defeat")
+
+func _check_achievements() -> void:
+	var added := achievements.evaluate(campaign_story,campaign_ending)
+	if added.is_empty():
+		return
+	var names: Array[String] = []
+	for item in ACHIEVEMENTS.ITEMS:
+		if item.id in added:
+			names.append(STORY_TEXT.text(str(item.name)))
+	var overlay := CanvasLayer.new()
+	overlay.layer = 110
+	add_child(overlay)
+	var message := _label(STORY_TEXT.text("OSIĄGNIĘCIE: ") + ", ".join(names),18,GOLD,HORIZONTAL_ALIGNMENT_CENTER)
+	message.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
+	message.offset_top = 12
+	message.offset_bottom = 48
+	message.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	overlay.add_child(message)
+	var timer := Timer.new()
+	timer.one_shot = true
+	overlay.add_child(timer)
+	timer.timeout.connect(overlay.queue_free)
+	timer.start(4.0)
+
+func _show_achievements() -> void:
+	_prepare_menu_screen()
+	current_menu = "achievements"
+	var margin := MarginContainer.new()
+	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	for side in ["left","right","top","bottom"]:
+		margin.add_theme_constant_override("margin_" + side,40)
+	screen_layer.add_child(margin)
+	var box := VBoxContainer.new()
+	margin.add_child(box)
+	box.add_child(_label(STORY_TEXT.text("OSIĄGNIĘCIA • %d / %d") % [achievements.unlocked.size(),ACHIEVEMENTS.ITEMS.size()],28,GOLD))
+	var scroll := ScrollContainer.new()
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	box.add_child(scroll)
+	var list := VBoxContainer.new()
+	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	list.add_theme_constant_override("separation",18)
+	scroll.add_child(list)
+	for item in ACHIEVEMENTS.ITEMS:
+		var unlocked := achievements.unlocked.has(item.id)
+		var hidden: bool = item.get("hidden",false) and not unlocked
+		var title: String = STORY_TEXT.text("Ukryte osiągnięcie") if hidden else STORY_TEXT.text(item.name)
+		var description: String = STORY_TEXT.text("W kronikach pozostało jeszcze coś do odkrycia.") if hidden else STORY_TEXT.text(item.description)
+		var line := _label(("✓ " if unlocked else "○ ") + title + "\n" + description,18,GOLD if unlocked else MUTED)
+		line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		list.add_child(line)
+	var back := _button(I18n.translate("back_to_menu"),GREEN,240)
+	back.pressed.connect(show_main_menu)
+	box.add_child(back)
