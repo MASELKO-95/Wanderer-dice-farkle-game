@@ -1,3 +1,4 @@
+https://maslo955.gamejolt.io/wanderer_dice
 # Wanderer dice farkle game
 
 > **Version 0.9.0 (Beta).** The campaign (*Kroniki Kostek* / *Chronicles of Dice*)
